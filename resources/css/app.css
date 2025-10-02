@@ -1,0 +1,93 @@
+body {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    font-family: "Segoe UI", sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar Styling */
+.custom-navbar {
+    background: linear-gradient(135deg, #0d47a1, #1976d2);
+    height: 60px;
+    padding: 0 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-navbar .navbar-brand {
+    color: #fff;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 240px;
+    height: calc(100vh - 60px);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    padding: 20px 15px;
+    color: #fff;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar h5 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #ddd;
+}
+
+.sidebar .nav-link {
+    margin-bottom: 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    color: #fff;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+    color: #fff;
+}
+
+/* Content */
+.content {
+    margin-left: 240px;
+    margin-top: 70px;
+    padding: 30px;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    border-radius: 16px;
+    padding: 25px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s;
+}
+.dashboard-card:hover {
+    transform: translateY(-6px) scale(1.05);
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+}
+
+.dashboard-card h6 {
+    font-weight: bold;
+    opacity: 0.9;
+}
