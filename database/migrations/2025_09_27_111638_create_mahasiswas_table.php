@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('mahasiswas', function (Blueprint $table) {
             $table->string('nim', 20)->primary();
             $table->string('nama');
+            $table->string('email')->unique();
             $table->string('kode_prodi', 20);
             $table->string('kode_angkatan', 20);
             $table->timestamps();
@@ -24,8 +25,6 @@ return new class extends Migration {
                 ->on('angkatans')
                 ->cascadeOnDelete();
         });
-
-
     }
 
     public function down(): void

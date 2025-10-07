@@ -10,22 +10,29 @@ return new class extends Migration {
         Schema::create('penilaians', function (Blueprint $table) {
             $table->id();
             $table->string('nim', 20);
-            $table->unsignedBigInteger('teknik_id');
-            $table->decimal('nilai', 5, 2)->default(0);
+            $table->string('kode_mk', 20);
+            $table->string('kode_angkatan', 20);
+            $table->decimal('nilai', 5, 2)->default(0); // nilai akhir MK
             $table->timestamps();
 
+            // Relasi ke mahasiswa
             $table->foreign('nim')
                 ->references('nim')
                 ->on('mahasiswas')
                 ->cascadeOnDelete();
 
-            $table->foreign('teknik_id')
-                ->references('id')
-                ->on('teknik_penilaians')
+            // Relasi ke mata kuliah
+            $table->foreign('kode_mk')
+                ->references('kode_mk')
+                ->on('mata_kuliahs')
+                ->cascadeOnDelete();
+
+            // Relasi ke angkatan
+            $table->foreign('kode_angkatan')
+                ->references('kode_angkatan')
+                ->on('angkatans')
                 ->cascadeOnDelete();
         });
-
-
     }
 
     public function down(): void

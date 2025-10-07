@@ -11,6 +11,10 @@ return new class extends Migration {
             $table->id('id_user');
             $table->string('google_id')->nullable();
             $table->string('password')->nullable();
+            
+            $table->string('kode_prodi', 20)->nullable();
+            $table->foreign('kode_prodi')->references('kode_prodi')->on('prodis')->onDelete('set null');
+
             $table->string('role')->default('admin');
             $table->string('nama');
             $table->string('email')->unique();
@@ -18,8 +22,6 @@ return new class extends Migration {
             $table->rememberToken();
             $table->timestamps();
         });
-
-
     }
 
     public function down(): void
