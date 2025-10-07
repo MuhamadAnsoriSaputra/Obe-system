@@ -46,5 +46,5 @@ Route::resource('angkatans', AngkatanController::class);
 Route::resource('mahasiswas', MahasiswaController::class);
 Route::resource('cpls', CplController::class);
 Route::resource('cpmks', CpmkController::class);
-Route::resource('mata-kuliahs', MataKuliahController::class);
+Route::resource('mata_kuliahs', MataKuliahController::class);
 Route::resource('dosens', DosenController::class);

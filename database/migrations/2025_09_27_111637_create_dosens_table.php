@@ -12,8 +12,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('id_user');
             $table->string('nama');
             $table->string('gelar')->nullable();
-            $table->string('jabatan')->nullable();
-            $table->string('email')->unique(); 
+            $table->string('jabatan')->nullable(); 
             $table->string('kode_prodi');      
             $table->timestamps();
 

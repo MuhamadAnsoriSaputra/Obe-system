@@ -19,10 +19,10 @@
 
         <div class="card shadow-lg border-0">
             <div class="card-body">
-                <table class="table table-hover text-white">
+                <table class="table table-hover text-white align-middle">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>No</th>
                             <th>Nama</th>
                             <th>Email</th>
                             <th>Role</th>
@@ -30,12 +30,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($users as $user)
+                        @forelse($users as $index => $user)
                             <tr>
-                                <td>{{ $user->id_user }}</td>
+                                {{-- Nomor urut otomatis (berdasarkan pagination) --}}
+                                <td>{{ $loop->iteration + ($users->firstItem() - 1) }}</td>
                                 <td>{{ $user->nama }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td><span class="badge bg-info">{{ ucfirst($user->role) }}</span></td>
+                                <td><span class="badge bg-info text-dark">{{ ucfirst($user->role) }}</span></td>
                                 <td>
                                     <a href="{{ route('users.edit', $user->id_user) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>

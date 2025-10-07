@@ -3,12 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Models\Dosen;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    use Notifiable;
+
     protected $primaryKey = 'id_user';
-    protected $fillable = ['google_id', 'password', 'role', 'nama', 'email', 'foto'];
+    protected $fillable = [
+        'google_id',
+        'password',
+        'role',
+        'nama',
+        'email',
+        'foto',
+        'kode_prodi',
+    ];
+
+    protected $hidden = ['password', 'remember_token'];
+
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class, 'kode_prodi', 'kode_prodi');
+    }
+
 
     public function dosen()
     {

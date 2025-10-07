@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h2 class="fw-bold mb-4">Daftar Dosen</h2>
+        <h2 class="fw-bold mb-4 text-white">Daftar Dosen</h2>
 
         {{-- Notifikasi sukses --}}
         @if(session('success'))
@@ -14,7 +14,8 @@
             <i class="fas fa-plus"></i> Tambah Dosen
         </a>
 
-        <div class="card shadow-lg border-0">
+        <div class="card shadow-lg border-0"
+            style="border-radius: 15px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); color:#fff;">
             <div class="card-body">
                 <table class="table table-hover text-white align-middle">
                     <thead>
@@ -41,8 +42,7 @@
                                     <a href="{{ route('dosens.edit', $dosen->nip) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('dosens.destroy', $dosen->nip) }}" method="POST"
-                                          class="d-inline" style="display:inline-block;">
+                                    <form action="{{ route('dosens.destroy', $dosen->nip) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger"
@@ -60,8 +60,10 @@
                     </tbody>
                 </table>
 
-                {{-- Pagination (jika menggunakan paginate di controller) --}}
-                {{ $dosens->links() }}
+                {{-- Pagination --}}
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $dosens->links() }}
+                </div>
             </div>
         </div>
     </div>

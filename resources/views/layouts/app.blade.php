@@ -63,8 +63,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url('/mata-kuliahs') }}"
-                    class="nav-link {{ request()->is('mata-kuliahs*') ? 'active' : '' }}">
+                <a href="{{ url('/mata_kuliahs') }}"
+                    class="nav-link {{ request()->is('mata_kuliahs*') ? 'active' : '' }}">
                     <i class="fas fa-book"></i> Mata Kuliah
                 </a>
             </li>
@@ -78,5 +78,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+<script>
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('toggle-password')) {
+            const input = e.target.closest('.input-group').querySelector('input');
+            input.type = input.type === 'password' ? 'text' : 'password';
+            e.target.classList.toggle('fa-eye');
+            e.target.classList.toggle('fa-eye-slash');
+        }
+    });
+</script>
 
 </html>

@@ -2,17 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\MataKuliah;
-use App\Models\Prodi;
 
 class Dosen extends Model
 {
+    use HasFactory;
+
     protected $primaryKey = 'nip';
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $fillable = ['nip', 'id_user', 'nama', 'gelar', 'jabatan', 'email', 'kode_prodi'];
+
+    protected $fillable = [
+        'nip',
+        'id_user',
+        'nama',
+        'gelar',
+        'jabatan',
+        'kode_prodi',
+    ];
 
     public function user()
     {

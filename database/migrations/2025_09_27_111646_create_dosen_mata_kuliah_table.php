@@ -32,7 +32,6 @@ return new class extends Migration {
                 ->on('angkatans')
                 ->cascadeOnDelete();
         });
-
     }
 
     public function down(): void

@@ -11,16 +11,19 @@ class DosenController extends Controller
 {
     public function index()
     {
-        // Ambil data dosen beserta prodi-nya
-        $dosens = Dosen::with('prodi')->paginate(10);
+        $dosens = Dosen::with(['prodi', 'user'])->paginate(10);
         return view('dosens.index', compact('dosens'));
     }
 
     public function create()
     {
-        // Ambil data user & prodi untuk dropdown
-        $users = User::all();
+        // Hanya user dengan role 'dosen' yang belum punya relasi dosen
+        $users = User::where('role', 'dosen')
+            ->whereDoesntHave('dosen')
+            ->get();
+
         $prodis = Prodi::all();
+
         return view('dosens.create', compact('users', 'prodis'));
     }
 
@@ -42,8 +45,11 @@ class DosenController extends Controller
     public function edit($nip)
     {
         $dosen = Dosen::findOrFail($nip);
-        $users = User::all();
+
+        // Semua user role 'dosen' (agar bisa ubah usernya jika perlu)
+        $users = User::where('role', 'dosen')->get();
         $prodis = Prodi::all();
+
         return view('dosens.edit', compact('dosen', 'users', 'prodis'));
     }
 
