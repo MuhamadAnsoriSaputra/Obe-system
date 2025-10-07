@@ -1,64 +1,89 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h2 class="fw-bold mb-4">Tambah Mahasiswa</h2>
+<div class="container">
+    <h2 class="fw-bold mb-4">Tambah Dosen</h2>
 
-        <form action="{{ route('mahasiswas.store') }}" method="POST">
-            @csrf
+    <div class="card shadow-lg border-0"
+        style="border-radius: 15px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); color:#fff;">
+        <div class="card-body p-4">
 
-            <div class="mb-3">
-                <label for="nim" class="form-label">NIM</label>
-                <input type="text" name="nim" class="form-control" required>
-            </div>
+            <form action="{{ route('dosens.store') }}" method="POST">
+                @csrf
 
-            <div class="mb-3">
-                <label for="nama" class="form-label">Nama</label>
-                <input type="text" name="nama" class="form-control" required>
-            </div>
+                <div class="mb-3">
+                    <label for="nip" class="form-label">NIP</label>
+                    <input type="text" name="nip" id="nip"
+                        class="form-control @error('nip') is-invalid @enderror" value="{{ old('nip') }}" required>
+                    @error('nip')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" name="email" id="email" class="form-control" required>
-            </div>
+                <div class="mb-3">
+                    <label for="nama" class="form-label">Nama Dosen</label>
+                    <input type="text" name="nama" id="nama"
+                        class="form-control @error('nama') is-invalid @enderror" value="{{ old('nama') }}" required>
+                    @error('nama')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            <div class="mb-3">
-                <label for="prodi" class="form-label">Program Studi</label>
-                <select name="kode_prodi" id="prodi" class="form-select" required>
-                    <option value="">-- Pilih Prodi --</option>
-                    @foreach($prodis as $prodi)
-                        <option value="{{ $prodi->kode_prodi }}">{{ $prodi->nama_prodi }}</option>
-                    @endforeach
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="gelar" class="form-label">Gelar</label>
+                    <input type="text" name="gelar" id="gelar"
+                        class="form-control @error('gelar') is-invalid @enderror"
+                        placeholder="Contoh: S.Kom., M.Kom." value="{{ old('gelar') }}">
+                    @error('gelar')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            <div class="mb-3">
-                <label for="kode_angkatan" class="form-label">Angkatan</label>
-                <select name="kode_angkatan" id="kode_angkatan" class="form-select" required>
-                    <option value="">-- Pilih Angkatan --</option>
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="jabatan" class="form-label">Jabatan</label>
+                    <input type="text" name="jabatan" id="jabatan"
+                        class="form-control @error('jabatan') is-invalid @enderror"
+                        placeholder="Contoh: Dosen Tetap, Kepala Prodi, dll" value="{{ old('jabatan') }}">
+                    @error('jabatan')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
 
-            <button type="submit" class="btn btn-primary">Simpan</button>
-            <a href="{{ route('mahasiswas.index') }}" class="btn btn-secondary">Batal</a>
-        </form>
+                <div class="mb-3">
+                    <label for="kode_prodi" class="form-label">Program Studi</label>
+                    <select name="kode_prodi" id="kode_prodi"
+                        class="form-select @error('kode_prodi') is-invalid @enderror" required>
+                        <option value="">-- Pilih Prodi --</option>
+                        @foreach($prodis as $prodi)
+                            <option value="{{ $prodi->kode_prodi }}" {{ old('kode_prodi') == $prodi->kode_prodi ? 'selected' : '' }}>
+                                {{ $prodi->nama_prodi }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('kode_prodi')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" name="email" id="email"
+                        class="form-control @error('email') is-invalid @enderror"
+                        value="{{ old('email') }}" required>
+                    @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('dosens.index') }}" class="btn btn-secondary me-2">Batal</a>
+                    <button type="submit" class="btn btn-light fw-bold px-4">
+                        <i class="fas fa-plus me-2"></i> Tambah
+                    </button>
+                </div>
+            </form>
+
+        </div>
     </div>
-
-    <script>
-        document.getElementById('prodi').addEventListener('change', function () {
-            let prodiId = this.value;
-            let angkatanSelect = document.getElementById('kode_angkatan');
-
-            angkatanSelect.innerHTML = '<option>Loading...</option>';
-
-            fetch(`/api/angkatan/by-prodi/${prodiId}`)
-                .then(res => res.json())
-                .then(data => {
-                    angkatanSelect.innerHTML = '<option value="">-- Pilih Angkatan --</option>';
-                    data.forEach(item => {
-                        angkatanSelect.innerHTML += `<option value="${item.kode_angkatan}">${item.tahun}</option>`;
-                    });
-                });
-        });
-    </script>
+</div>
 @endsection
