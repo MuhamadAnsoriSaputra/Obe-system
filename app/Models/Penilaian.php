@@ -7,15 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Penilaian extends Model
 {
-    protected $fillable = ['nim', 'teknik_id', 'nilai'];
+    use HasFactory;
+
+    protected $fillable = [
+        'nim',
+        'kode_mk',
+        'kode_angkatan',
+        'nilai',
+    ];
 
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class, 'nim', 'nim');
     }
 
-    public function teknik()
+    public function mataKuliah()
     {
-        return $this->belongsTo(TeknikPenilaian::class, 'teknik_id', 'id');
+        return $this->belongsTo(MataKuliah::class, 'kode_mk', 'kode_mk');
+    }
+
+    public function angkatan()
+    {
+        return $this->belongsTo(Angkatan::class, 'kode_angkatan', 'kode_angkatan');
     }
 }
