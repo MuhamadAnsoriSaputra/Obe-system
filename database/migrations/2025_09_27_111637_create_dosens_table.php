@@ -13,14 +13,20 @@ return new class extends Migration {
             $table->string('nama');
             $table->string('gelar')->nullable();
             $table->string('jabatan')->nullable();
+            $table->string('email')->unique(); 
+            $table->string('kode_prodi');      
             $table->timestamps();
 
             $table->foreign('id_user')
                 ->references('id_user')
                 ->on('users')
                 ->onDelete('cascade');
-        });
 
+            $table->foreign('kode_prodi')
+                ->references('kode_prodi')
+                ->on('prodis')
+                ->onDelete('cascade');
+        });
     }
 
     public function down(): void

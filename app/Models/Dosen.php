@@ -5,17 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\MataKuliah;
+use App\Models\Prodi;
 
 class Dosen extends Model
 {
     protected $primaryKey = 'nip';
     public $incrementing = false;
     protected $keyType = 'string';
-    protected $fillable = ['nip', 'id_user', 'nama', 'gelar', 'jabatan'];
+    protected $fillable = ['nip', 'id_user', 'nama', 'gelar', 'jabatan', 'email', 'kode_prodi'];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'id_user', 'id_user');
+    }
+
+    public function prodi()
+    {
+        return $this->belongsTo(Prodi::class, 'kode_prodi', 'kode_prodi');
     }
 
     public function mataKuliahs()

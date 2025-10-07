@@ -10,6 +10,7 @@ use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\CplController;
 use App\Http\Controllers\CpmkController;
 use App\Http\Controllers\MataKuliahController;
+use App\Http\Controllers\DosenController;
 
 // Model
 use App\Models\User;
@@ -46,3 +47,4 @@ Route::resource('mahasiswas', MahasiswaController::class);
 Route::resource('cpls', CplController::class);
 Route::resource('cpmks', CpmkController::class);
 Route::resource('mata-kuliahs', MataKuliahController::class);
+Route::resource('dosens', DosenController::class);
