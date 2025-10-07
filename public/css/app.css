@@ -32,6 +32,20 @@ body {
     padding: 20px 15px;
     color: #fff;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
+    overflow-y: auto;
+}
+/* Scrollbar Styling (untuk Chrome/Edge) */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .sidebar h5 {
