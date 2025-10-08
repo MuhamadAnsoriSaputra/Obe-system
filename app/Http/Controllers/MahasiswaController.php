@@ -12,22 +12,14 @@ class MahasiswaController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
-        // jika belum login, buat user "dummy" akademik sementara
-        if (!$user) {
-            $user = (object) [
-                'role' => 'akademik',
-                'id_prodi' => null, // isi sesuai kebutuhan
-            ];
-        }
-
-        // logika sesuai role
-        if ($user->role == 'akademik') {
-            $mahasiswas = Mahasiswa::paginate(10);
+        // Jika role akademik → hanya tampilkan mahasiswa dari prodi-nya
+        if ($user->role === 'akademik') {
+            $mahasiswas = Mahasiswa::where('kode_prodi', $user->kode_prodi)->paginate(10);
         } else {
+            // Admin bisa lihat semua mahasiswa
             $mahasiswas = Mahasiswa::paginate(10);
-
         }
 
         return view('mahasiswas.index', compact('mahasiswas'));
@@ -38,7 +30,8 @@ class MahasiswaController extends Controller
         $user = Auth::user();
         $angkatans = Angkatan::all();
 
-        if ($user->role === 'akademik_prodi' && $user->kode_prodi) {
+        // Jika akademik → tidak perlu pilih prodi (otomatis)
+        if ($user->role === 'akademik') {
             $prodis = Prodi::where('kode_prodi', $user->kode_prodi)->get();
         } else {
             $prodis = Prodi::all();
@@ -58,13 +51,13 @@ class MahasiswaController extends Controller
             'kode_angkatan' => 'required|exists:angkatans,kode_angkatan',
         ]);
 
-        $kodeProdi = $user->role === 'akademik_prodi' ? $user->kode_prodi : $request->kode_prodi;
-
         Mahasiswa::create([
             'nim' => $request->nim,
             'nama' => $request->nama,
             'email' => $request->email,
-            'kode_prodi' => $kodeProdi,
+            'kode_prodi' => $user->role === 'akademik'
+                ? $user->kode_prodi  // otomatis isi dari user login
+                : $request->kode_prodi, // admin bisa pilih
             'kode_angkatan' => $request->kode_angkatan,
         ]);
 
@@ -73,9 +66,19 @@ class MahasiswaController extends Controller
 
     public function edit($nim)
     {
+        $user = Auth::user();
         $mahasiswa = Mahasiswa::findOrFail($nim);
         $angkatans = Angkatan::all();
-        $prodis = Prodi::all();
+
+        if ($user->role === 'akademik') {
+            // pastikan hanya bisa edit mahasiswa dari prodi sendiri
+            if ($mahasiswa->kode_prodi !== $user->kode_prodi) {
+                abort(403, 'Anda tidak memiliki izin untuk mengedit mahasiswa prodi lain.');
+            }
+            $prodis = Prodi::where('kode_prodi', $user->kode_prodi)->get();
+        } else {
+            $prodis = Prodi::all();
+        }
 
         return view('mahasiswas.edit', compact('mahasiswa', 'angkatans', 'prodis'));
     }
@@ -83,12 +86,19 @@ class MahasiswaController extends Controller
     public function update(Request $request, $nim)
     {
         $mahasiswa = Mahasiswa::findOrFail($nim);
+        $user = Auth::user();
 
+        // validasi dasar
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:mahasiswas,email,' . $nim . ',nim',
             'kode_angkatan' => 'required|exists:angkatans,kode_angkatan',
         ]);
+
+        // pastikan akademik hanya bisa update prodi-nya sendiri
+        if ($user->role === 'akademik' && $mahasiswa->kode_prodi !== $user->kode_prodi) {
+            abort(403, 'Anda tidak memiliki izin untuk memperbarui mahasiswa prodi lain.');
+        }
 
         $mahasiswa->update([
             'nama' => $request->nama,
@@ -102,6 +112,12 @@ class MahasiswaController extends Controller
     public function destroy($nim)
     {
         $mahasiswa = Mahasiswa::findOrFail($nim);
+        $user = Auth::user();
+
+        if ($user->role === 'akademik' && $mahasiswa->kode_prodi !== $user->kode_prodi) {
+            abort(403, 'Anda tidak memiliki izin untuk menghapus mahasiswa prodi lain.');
+        }
+
         $mahasiswa->delete();
 
         return redirect()->route('mahasiswas.index')->with('success', 'Mahasiswa berhasil dihapus');

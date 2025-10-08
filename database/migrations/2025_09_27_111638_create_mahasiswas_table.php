@@ -18,13 +18,16 @@ return new class extends Migration {
             $table->foreign('kode_prodi')
                 ->references('kode_prodi')
                 ->on('prodis')
+                ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
             $table->foreign('kode_angkatan')
                 ->references('kode_angkatan')
                 ->on('angkatans')
+                ->cascadeOnUpdate()
                 ->cascadeOnDelete();
         });
+
     }
 
     public function down(): void

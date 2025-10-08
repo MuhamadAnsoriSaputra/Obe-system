@@ -2,15 +2,15 @@
 
 @section('content')
     <div class="container">
-        <h2 class="fw-bold mb-4">Daftar Mahasiswa</h2>
-
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+        <h2 class="fw-bold mb-4">Manajemen Mahasiswa</h2>
 
         <a href="{{ route('mahasiswas.create') }}" class="btn btn-light fw-bold mb-3">
             <i class="fas fa-plus"></i> Tambah Mahasiswa
         </a>
+
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
         <div class="card shadow-lg border-0">
             <div class="card-body">
@@ -31,25 +31,21 @@
                                 <td>{{ $mhs->nim }}</td>
                                 <td>{{ $mhs->nama }}</td>
                                 <td>{{ $mhs->email }}</td>
-                                <td>{{ $mhs->angkatan->prodi->nama_prodi ?? '-' }}</td>
+                                <td>{{ $mhs->prodi->nama_prodi ?? '-' }}</td>
                                 <td>{{ $mhs->angkatan->tahun ?? '-' }}</td>
                                 <td>
-                                    <a href="{{ route('mahasiswas.edit', $mhs->nim) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('mahasiswas.destroy', $mhs->nim) }}" method="POST" class="d-inline"
-                                        style="display:inline-block;">
+                                    <a href="{{ route('mahasiswas.edit', $mhs->nim) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form action="{{ route('mahasiswas.destroy', $mhs->nim) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Yakin hapus mahasiswa ini?')"><i
-                                                class="fas fa-trash"></i></button>
+                                        <button class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Yakin hapus?')">Hapus</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">Belum ada data mahasiswa</td>
+                                <td colspan="6" class="text-center">Belum ada mahasiswa</td>
                             </tr>
                         @endforelse
                     </tbody>

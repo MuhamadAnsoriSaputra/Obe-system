@@ -3,67 +3,58 @@
 namespace App\Http\Controllers;
 
 use App\Models\MataKuliah;
-use App\Models\Prodi;
+use App\Models\Cpl;
 use App\Models\Angkatan;
 use Illuminate\Http\Request;
 
 class MataKuliahController extends Controller
 {
+
     public function index()
     {
-        $mataKuliahs = MataKuliah::with(['prodi', 'angkatan'])->get();
+        $mataKuliahs = MataKuliah::with(['prodi', 'angkatan', 'dosens'])->paginate(10);
         return view('mata_kuliahs.index', compact('mataKuliahs'));
     }
 
-    public function create()
+    public function show($kode_mk)
     {
-        $prodis = Prodi::all();
+        $mk = MataKuliah::with(['prodi', 'angkatan', 'dosens'])->findOrFail($kode_mk);
         $angkatans = Angkatan::all();
-        return view('mata_kuliahs.create', compact('prodis', 'angkatans'));
+        $cpls = Cpl::where('kode_prodi', $mk->kode_prodi)->with('cpmks')->get();
+
+        // Ambil CPMK existing per mata kuliah
+        $cpmksExisting = $mk->cpmks()->get()->keyBy('kode_cpmk');
+
+        return view('mata_kuliahs.show', compact('mk', 'angkatans', 'cpls', 'cpmksExisting'));
     }
 
-    public function store(Request $request)
+    public function updateCpmk(Request $request, $kode_mk)
     {
         $request->validate([
-            'kode_mk' => 'required|unique:mata_kuliahs,kode_mk',
-            'kode_prodi' => 'required',
             'kode_angkatan' => 'required',
-            'nama_mk' => 'required',
-            'sks' => 'required|integer|min:1',
+            'cpmks' => 'required|array',
         ]);
 
-        MataKuliah::create($request->all());
-        return redirect()->route('mata_kuliahs.index')->with('success', 'Data mata kuliah berhasil ditambahkan.');
-    }
-
-    public function edit($kode_mk)
-    {
-        $mataKuliah = MataKuliah::findOrFail($kode_mk);
-        $prodis = Prodi::all();
-        $angkatans = Angkatan::all();
-        return view('mata_kuliahs.edit', compact('mataKuliah', 'prodis', 'angkatans'));
-    }
-
-    public function update(Request $request, $kode_mk)
-    {
-        $request->validate([
-            'kode_prodi' => 'required',
-            'kode_angkatan' => 'required',
-            'nama_mk' => 'required',
-            'sks' => 'required|integer|min:1',
-        ]);
+        $totalBobot = array_sum($request->bobot);
+        if ($totalBobot != 100) {
+            return back()->with('error', 'Total bobot CPMK harus 100%');
+        }
 
         $mataKuliah = MataKuliah::findOrFail($kode_mk);
-        $mataKuliah->update($request->all());
+        $kode_angkatan = $request->kode_angkatan;
 
-        return redirect()->route('mata_kuliahs.index')->with('success', 'Data mata kuliah berhasil diperbarui.');
-    }
+        // Hapus dulu bobot lama untuk mata kuliah + angkatan
+        $mataKuliah->cpmks()->wherePivot('kode_angkatan', $kode_angkatan)->detach();
 
-    public function destroy($kode_mk)
-    {
-        $mataKuliah = MataKuliah::findOrFail($kode_mk);
-        $mataKuliah->delete();
+        // Simpan bobot baru
+        foreach ($request->cpmks as $kode_cpmk => $bobot) {
+            $mataKuliah->cpmks()->attach($kode_cpmk, [
+                'kode_angkatan' => $kode_angkatan,
+                'bobot' => $bobot
+            ]);
+        }
 
-        return redirect()->route('mata_kuliahs.index')->with('success', 'Data mata kuliah berhasil dihapus.');
+        return redirect()->route('mata_kuliahs.show', $kode_mk)
+            ->with('success', 'Bobot CPMK berhasil disimpan.');
     }
 }

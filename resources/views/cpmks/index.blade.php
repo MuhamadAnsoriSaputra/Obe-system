@@ -12,15 +12,16 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <div class="card shadow-lg border-0">
+        <div class="card shadow-lg border-0"
+            style="border-radius: 15px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); color:#fff;">
             <div class="card-body">
                 <table class="table table-hover text-white">
                     <thead>
                         <tr>
                             <th>Kode CPMK</th>
-                            <th>CPL</th>
-                            <th>Mata Kuliah</th>
                             <th>Deskripsi</th>
+                            <th>Kode CPL</th>
+                            <th>Program Studi</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -28,9 +29,9 @@
                         @forelse($cpmks as $cpmk)
                             <tr>
                                 <td>{{ $cpmk->kode_cpmk }}</td>
-                                <td>{{ $cpmk->cpl->kode_cpl ?? '-' }}</td>
-                                <td>{{ $cpmk->mataKuliah->nama_mk ?? '-' }}</td>
                                 <td>{{ $cpmk->deskripsi_cpmk }}</td>
+                                <td>{{ $cpmk->kode_cpl }}</td>
+                                <td>{{ $cpmk->cpl->prodi->nama_prodi ?? '-' }}</td>
                                 <td>
                                     <a href="{{ route('cpmks.edit', $cpmk->kode_cpmk) }}"
                                         class="btn btn-sm btn-warning">Edit</a>
@@ -39,13 +40,13 @@
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Yakin hapus?')">Hapus</button>
+                                            onclick="return confirm('Yakin hapus CPMK ini?')">Hapus</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center">Belum ada CPMK</td>
+                                <td colspan="5" class="text-center text-light">Belum ada CPMK</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -4,22 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\Cpmk;
 use App\Models\Cpl;
-use App\Models\MataKuliah;
-use App\Models\Angkatan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CpmkController extends Controller
 {
     public function index()
     {
-        $cpmks = Cpmk::with(['cpl', 'mataKuliah'])->paginate(10);
+        $user = Auth::user();
+
+        // Filter CPMK berdasarkan prodi akademik
+        if ($user->role === 'akademik' && $user->kode_prodi) {
+            $cpmks = Cpmk::whereHas('cpl', function ($query) use ($user) {
+                $query->where('kode_prodi', $user->kode_prodi);
+            })->with('cpl')->paginate(10);
+        } else {
+            $cpmks = Cpmk::with('cpl')->paginate(10);
+        }
+
         return view('cpmks.index', compact('cpmks'));
     }
 
     public function create()
     {
-        $angkatans = Angkatan::all();
-        return view('cpmks.create', compact('angkatans'));
+        $user = Auth::user();
+
+        // Hanya tampilkan CPL sesuai prodi akademik
+        if ($user->role === 'akademik' && $user->kode_prodi) {
+            $cpls = Cpl::where('kode_prodi', $user->kode_prodi)->get();
+        } else {
+            $cpls = Cpl::all();
+        }
+
+        return view('cpmks.create', compact('cpls'));
     }
 
     public function store(Request $request)
@@ -27,20 +44,27 @@ class CpmkController extends Controller
         $request->validate([
             'kode_cpmk' => 'required|unique:cpmks,kode_cpmk',
             'kode_cpl' => 'required|exists:cpls,kode_cpl',
-            'kode_mk' => 'required|exists:mata_kuliahs,kode_mk',
             'deskripsi_cpmk' => 'required|string',
         ]);
 
-        Cpmk::create($request->all());
+        Cpmk::create($request->only(['kode_cpmk', 'kode_cpl', 'deskripsi_cpmk']));
 
         return redirect()->route('cpmks.index')->with('success', 'CPMK berhasil ditambahkan.');
     }
 
     public function edit($kode_cpmk)
     {
+        $user = Auth::user();
         $cpmk = Cpmk::findOrFail($kode_cpmk);
-        $angkatans = Angkatan::all();
-        return view('cpmks.edit', compact('cpmk', 'angkatans'));
+
+        // Filter CPL sesuai prodi akademik
+        if ($user->role === 'akademik' && $user->kode_prodi) {
+            $cpls = Cpl::where('kode_prodi', $user->kode_prodi)->get();
+        } else {
+            $cpls = Cpl::all();
+        }
+
+        return view('cpmks.edit', compact('cpmk', 'cpls'));
     }
 
     public function update(Request $request, $kode_cpmk)
@@ -49,11 +73,10 @@ class CpmkController extends Controller
 
         $request->validate([
             'kode_cpl' => 'required|exists:cpls,kode_cpl',
-            'kode_mk' => 'required|exists:mata_kuliahs,kode_mk',
             'deskripsi_cpmk' => 'required|string',
         ]);
 
-        $cpmk->update($request->all());
+        $cpmk->update($request->only(['kode_cpl', 'deskripsi_cpmk']));
 
         return redirect()->route('cpmks.index')->with('success', 'CPMK berhasil diperbarui.');
     }
@@ -64,19 +87,5 @@ class CpmkController extends Controller
         $cpmk->delete();
 
         return redirect()->route('cpmks.index')->with('success', 'CPMK berhasil dihapus.');
-    }
-
-    // 🔹 API untuk filter CPL berdasarkan angkatan
-    public function getCplByAngkatan($kode_angkatan)
-    {
-        $cpls = Cpl::where('kode_angkatan', $kode_angkatan)->get();
-        return response()->json($cpls);
-    }
-
-    // 🔹 API untuk filter Mata Kuliah berdasarkan Prodi + Angkatan
-    public function getMkByAngkatan($kode_angkatan)
-    {
-        $mataKuliahs = MataKuliah::where('kode_angkatan', $kode_angkatan)->get();
-        return response()->json($mataKuliahs);
     }
 }
