@@ -14,7 +14,7 @@ return new class extends Migration {
             
             $table->string('kode_prodi', 20)->nullable();
             $table->foreign('kode_prodi')->references('kode_prodi')->on('prodis')->onDelete('set null');
-
+   
             $table->string('role')->default('admin');
             $table->string('nama');
             $table->string('email')->unique();

@@ -81,6 +81,16 @@ class CpmkController extends Controller
         return redirect()->route('cpmks.index')->with('success', 'CPMK berhasil diperbarui.');
     }
 
+    public function getCplByAngkatan($kode_angkatan, $kode_prodi)
+    {
+        $cpls = Cpl::where('kode_prodi', $kode_prodi)
+            ->where('kode_angkatan', $kode_angkatan)
+            ->get(['kode_cpl', 'deskripsi']);
+
+        return response()->json($cpls);
+    }
+
+
     public function destroy($kode_cpmk)
     {
         $cpmk = Cpmk::findOrFail($kode_cpmk);

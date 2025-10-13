@@ -2,90 +2,164 @@
 
 @section('content')
     <div class="container">
+        <h3 class="fw-bold mb-4">Detail Mata Kuliah: {{ $mataKuliah->nama_mk }}</h3>
 
-        {{-- Detail Mata Kuliah --}}
-        <div class="card mb-4">
-            <div class="card-header">
-                Detail Mata Kuliah
-            </div>
+        <div class="card shadow-lg border-0 mb-4">
             <div class="card-body">
-                <p><strong>Kode MK:</strong> {{ $mk->kode_mk }}</p>
-                <p><strong>Nama MK:</strong> {{ $mk->nama_mk }}</p>
-                <p><strong>Prodi:</strong> {{ $mk->prodi->nama_prodi ?? '-' }}</p>
-                <p><strong>Dosens:</strong>
-                    @foreach($mk->dosens as $dosen)
-                        {{ $dosen->nama_dosen }}@if(!$loop->last), @endif
-                    @endforeach
-                </p>
+                <p><strong>Kode MK:</strong> {{ $mataKuliah->kode_mk }}</p>
+                <p><strong>Program Studi:</strong> {{ $mataKuliah->prodi->nama_prodi ?? '-' }}</p>
+                <p><strong>SKS:</strong> {{ $mataKuliah->sks }}</p>
             </div>
         </div>
 
-        {{-- Notifikasi --}}
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+        <div class="card shadow-lg border-0 mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">CPMK & Bobot</h5>
 
-        {{-- Form Update CPMK --}}
-        <form action="{{ route('mata_kuliahs.updateCpmk', $mk->kode_mk) }}" method="POST">
-            @csrf
-            @method('PUT')
+                {{-- Form tambah/ubah bobot --}}
+                <form id="formBobot" action="{{ route('mata_kuliahs.simpanBobot', $mataKuliah->kode_mk) }}" method="POST">
+                    @csrf
 
-            {{-- Dropdown Angkatan --}}
-            <div class="mb-3">
-                <label for="kode_angkatan" class="form-label">Angkatan</label>
-                <select name="kode_angkatan" id="kode_angkatan" class="form-select" required>
-                    <option value="">-- Pilih Angkatan --</option>
-                    @foreach($angkatans as $angkatan)
-                        <option value="{{ $angkatan->kode_angkatan }}">{{ $angkatan->tahun }}</option>
-                    @endforeach
-                </select>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Tahun Angkatan</label>
+                        <select name="kode_angkatan" id="angkatan" class="form-select" required>
+                            <option value="">-- Pilih Angkatan --</option>
+                            @foreach($angkatans as $angkatan)
+                                <option value="{{ $angkatan->kode_angkatan }}">{{ $angkatan->tahun }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">CPL</label>
+                        <select name="kode_cpl" id="cpl" class="form-select" required>
+                            <option value="">-- Pilih CPL --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-5 mb-3">
+                        <label class="form-label">CPMK</label>
+                        <select name="kode_cpmk" id="cpmk" class="form-select" required>
+                            <option value="">-- Pilih CPMK --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Bobot (%)</label>
+                        <input type="number" name="bobot" class="form-control" placeholder="Contoh: 25" required min="0"
+                            max="100">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary fw-bold">Simpan Bobot</button>
+                </form>
             </div>
+        </div>
 
-            {{-- Dropdown CPL --}}
-            <div class="mb-3">
-                <label for="kode_cpl" class="form-label">CPL</label>
-                <select name="kode_cpl" id="kode_cpl" class="form-select" required>
-                    <option value="">-- Pilih CPL --</option>
-                    @foreach($cpls as $cpl)
-                        <option value="{{ $cpl->kode_cpl }}">{{ $cpl->kode_cpl }}</option>
-                    @endforeach
-                </select>
-            </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function () {
 
-            {{-- Container CPMK + Bobot --}}
-            <div id="cpmk-container" class="mb-3">
-                {{-- CPMK akan muncul disini via JS --}}
-            </div>
+                // Ketika Tahun Angkatan dipilih → update CPL
+                $('#angkatan').change(function () {
+                    var kodeAngkatan = $(this).val();
+                    var kodeProdi = '{{ $mataKuliah->kode_prodi }}'; // Prodi MK saat ini
 
-            <button type="submit" class="btn btn-primary">Simpan Bobot</button>
-        </form>
+                    $('#cpl').html('<option value="">Loading...</option>');
+                    $('#cpmk').html('<option value="">-- Pilih CPMK --</option>');
 
-    </div>
-
-    {{-- Script untuk menampilkan CPMK saat CPL dipilih --}}
-    <script>
-        const cpls = @json($cpls->keyBy('kode_cpl')->map(fn($cpl) => $cpl->cpmks));
-
-        document.getElementById('kode_cpl').addEventListener('change', function () {
-            const selectedCpl = this.value;
-            const container = document.getElementById('cpmk-container');
-            container.innerHTML = '';
-
-            if (selectedCpl && cpls[selectedCpl]) {
-                cpls[selectedCpl].forEach(cpmk => {
-                    const div = document.createElement('div');
-                    div.classList.add('mb-2', 'd-flex', 'align-items-center');
-                    div.innerHTML = `
-                    <input type="text" class="form-control me-2" value="${cpmk.kode_cpmk}" readonly>
-                    <input type="number" name="cpmks[${cpmk.kode_cpmk}]" class="form-control" placeholder="Bobot %" required>
-                `;
-                    container.appendChild(div);
+                    if (kodeAngkatan) {
+                        $.get('/api/cpl/by-angkatan/' + kodeAngkatan + '/' + kodeProdi, function (data) {
+                            var options = '<option value="">-- Pilih CPL --</option>';
+                            data.forEach(function (cpl) {
+                                options += '<option value="' + cpl.kode_cpl + '">' + cpl.kode_cpl + '</option>';
+                            });
+                            $('#cpl').html(options);
+                        }).fail(function () {
+                            $('#cpl').html('<option value="">-- Pilih CPL --</option>');
+                        });
+                    } else {
+                        $('#cpl').html('<option value="">-- Pilih CPL --</option>');
+                    }
                 });
-            }
-        });
-    </script>
 
+                // Ketika CPL dipilih → update CPMK
+                $('#cpl').change(function () {
+                    var kodeCpl = $(this).val();
+                    var kodeMk = '{{ $mataKuliah->kode_mk }}';
+
+                    $('#cpmk').html('<option value="">Loading...</option>');
+
+                    if (kodeCpl) {
+                        $.get('/api/cpmks/' + kodeCpl + '/' + kodeMk, function (data) {
+                            var options = '<option value="">-- Pilih CPMK --</option>';
+                            data.forEach(function (cpmk) {
+                                options += '<option value="' + cpmk.kode_cpmk + '">' + cpmk.kode_cpmk + '</option>';
+                            });
+                            $('#cpmk').html(options);
+                        }).fail(function () {
+                            $('#cpmk').html('<option value="">-- Pilih CPMK --</option>');
+                        });
+                    } else {
+                        $('#cpmk').html('<option value="">-- Pilih CPMK --</option>');
+                    }
+                });
+
+                // Cek bobot total sebelum submit
+                $('#formBobot').submit(function (e) {
+                    e.preventDefault();
+                    var kodeAngkatan = $('#angkatan').val();
+                    var bobot = parseFloat($('input[name="bobot"]').val());
+
+                    if (!kodeAngkatan) { alert('Pilih angkatan dulu!'); return; }
+
+                    $.get('/api/cpmk-mk-total/{{ $mataKuliah->kode_mk }}/' + kodeAngkatan, function (total) {
+                        if (total + bobot > 100) {
+                            alert('Total bobot CPMK untuk angkatan ini sudah mencapai 100%!');
+                        } else {
+                            e.currentTarget.submit(); // lanjut submit
+                        }
+                    });
+                });
+
+            });
+        </script>
+
+        {{-- Tabel CPMK yang sudah ada --}}
+        <div class="card shadow-lg border-0">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Daftar CPMK Mata Kuliah</h5>
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Angkatan</th>
+                            <th>CPMK</th>
+                            <th>Bobot (%)</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($cpmkMataKuliah as $item)
+                            <tr>
+                                <td>{{ $item->kode_angkatan }}</td>
+                                <td>{{ $item->kode_cpmk }}</td>
+                                <td>{{ $item->bobot }}</td>
+                                <td>
+                                    <form action="{{ route('mata_kuliahs.removeCpmk', $item->id) }}" method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus bobot ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center">Belum ada CPMK</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 @endsection

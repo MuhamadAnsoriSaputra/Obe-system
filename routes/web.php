@@ -20,61 +20,60 @@ use App\Models\Mahasiswa;
 use App\Models\MataKuliah;
 use App\Models\Prodi;
 
-// DASHBOARD
-Route::get('/dashboard', function () {
-    $stats = [
-        'users' => User::count(),
-        'dosens' => Dosen::count(),
-        'mahasiswas' => Mahasiswa::count(),
-        'prodis' => Prodi::count(),
-        'mata_kuliahs' => MataKuliah::count(),
-    ];
-    return view('dashboard', compact('stats'));
-})->name('dashboard');
-
-// DEFAULT REDIRECT
-Route::get('/', fn() => redirect()->route('dashboard'));
-
-// API
-Route::get('/api/cpl/by-angkatan/{kode_angkatan}', [CpmkController::class, 'getCplByAngkatan']);
-Route::get('/api/mk/by-angkatan/{kode_angkatan}', [CpmkController::class, 'getMkByAngkatan']);
-Route::get('/api/angkatan/by-prodi/{kode_prodi}', [AngkatanController::class, 'getByProdi']);
-Route::get('/cpl/{kode_angkatan}', [CpmkController::class, 'getCplByAngkatan']);
-Route::get('/cpmk/{kode_cpl}', [MataKuliahController::class, 'getCpmkByCpl']);
-
-// CRUD Routes pakai resource
-Route::resource('users', UserController::class);
-Route::resource('prodis', ProdiController::class);
-Route::resource('angkatans', AngkatanController::class);
-Route::resource('mahasiswas', MahasiswaController::class);
-Route::resource('cpls', CplController::class);
-Route::resource('cpmks', CpmkController::class);
-Route::resource('mata_kuliahs', MataKuliahController::class);
-Route::resource('dosens', DosenController::class);
+// ----------------------
+// Public Routes
+// ----------------------
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-Route::get('/mata_kuliahs/{kode_mk}', [MataKuliahController::class, 'show'])->name('mata_kuliahs.show');
-Route::get('/mata_kuliahs/{kode_mk}', [MataKuliahController::class, 'show'])->name('mata_kuliahs.show');
-Route::post('/mata_kuliahs/{kode_mk}/add-cpmk', [MataKuliahController::class, 'addCpmk'])->name('mata_kuliahs.addCpmk');
-Route::delete('/mata_kuliahs/remove-cpmk/{id}', [MataKuliahController::class, 'removeCpmk'])->name('mata_kuliahs.removeCpmk');
-Route::put('/mata_kuliahs/{kode_mk}/update-cpmk', [MataKuliahController::class, 'updateCpmk'])
-    ->name('mata_kuliahs.updateCpmk');
 
-Route::get('api/cpmks/{kode_cpl}/{kode_mk}', function ($kode_cpl, $kode_mk) {
-    $cpmks = App\Models\Cpmk::where('kode_cpl', $kode_cpl)
-        ->with([
-            'mataKuliahs' => function ($q) use ($kode_mk) {
-                $q->where('kode_mk', $kode_mk);
-            }
-        ])->get();
+// Default redirect
+Route::get('/', fn() => redirect()->route('dashboard'));
 
-    return response()->json($cpmks);
-});
-
-
+// ----------------------
+// Protected Routes (auth)
+// ----------------------
 Route::middleware('auth')->group(function () {
+
+    // Dashboard
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $stats = [
+            'users' => User::count(),
+            'dosens' => Dosen::count(),
+            'mahasiswas' => Mahasiswa::count(),
+            'prodis' => Prodi::count(),
+            'mata_kuliahs' => MataKuliah::count(),
+        ];
+        return view('dashboard', compact('stats'));
     })->name('dashboard');
+
+    // Resource CRUD
+    Route::resources([
+        'users' => UserController::class,
+        'prodis' => ProdiController::class,
+        'angkatans' => AngkatanController::class,
+        'mahasiswas' => MahasiswaController::class,
+        'cpls' => CplController::class,
+        'cpmks' => CpmkController::class,
+        'mata_kuliahs' => MataKuliahController::class,
+        'dosens' => DosenController::class,
+    ]);
+
+    // Mata Kuliah Detail / Bobot / CPMK
+    Route::prefix('mata_kuliahs')->group(function () {
+        Route::get('{kode_mk}', [MataKuliahController::class, 'show'])->name('mata_kuliahs.show');
+        Route::post('{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
+        Route::post('{kode_mk}/detail', [MataKuliahController::class, 'storeDetail'])->name('mata_kuliahs.storeDetail');
+        Route::delete('remove-cpmk/{id}', [MataKuliahController::class, 'removeCpmk'])->name('mata_kuliahs.removeCpmk');
+        Route::put('{kode_mk}/update-cpmk', [MataKuliahController::class, 'updateCpmk'])->name('mata_kuliahs.updateCpmk');
+    });
+
+    // AJAX / API Routes
+    Route::prefix('api')->group(function () {
+        Route::get('cpl/by-angkatan/{kode_angkatan}/{kode_prodi}', [CpmkController::class, 'getCplByAngkatan']);
+        Route::get('cpmks/{kode_cpl}/{kode_mk}', [MataKuliahController::class, 'getCpmkByCpl']);
+        Route::get('angkatan/by-prodi/{kode_prodi}', [AngkatanController::class, 'getByProdi']);
+        Route::get('cpmk-mk-total/{kode_mk}/{kode_angkatan}', [MataKuliahController::class, 'totalBobot']);
+    });
+
 });

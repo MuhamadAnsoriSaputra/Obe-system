@@ -3,58 +3,178 @@
 namespace App\Http\Controllers;
 
 use App\Models\MataKuliah;
-use App\Models\Cpl;
+use App\Models\Prodi;
 use App\Models\Angkatan;
+use App\Models\Dosen;
 use Illuminate\Http\Request;
 
 class MataKuliahController extends Controller
 {
-
     public function index()
     {
         $mataKuliahs = MataKuliah::with(['prodi', 'angkatan', 'dosens'])->paginate(10);
         return view('mata_kuliahs.index', compact('mataKuliahs'));
     }
 
-    public function show($kode_mk)
+    public function create()
     {
-        $mk = MataKuliah::with(['prodi', 'angkatan', 'dosens'])->findOrFail($kode_mk);
+        $prodis = Prodi::all();
         $angkatans = Angkatan::all();
-        $cpls = Cpl::where('kode_prodi', $mk->kode_prodi)->with('cpmks')->get();
-
-        // Ambil CPMK existing per mata kuliah
-        $cpmksExisting = $mk->cpmks()->get()->keyBy('kode_cpmk');
-
-        return view('mata_kuliahs.show', compact('mk', 'angkatans', 'cpls', 'cpmksExisting'));
+        $dosens = Dosen::all();
+        return view('mata_kuliahs.create', compact('prodis', 'angkatans', 'dosens'));
     }
 
-    public function updateCpmk(Request $request, $kode_mk)
+    public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'kode_mk' => 'required|unique:mata_kuliahs,kode_mk|max:20',
+            'nama_mk' => 'required|string|max:100',
+            'kode_prodi' => 'required',
             'kode_angkatan' => 'required',
-            'cpmks' => 'required|array',
+            'sks' => 'required|integer|min:1',
+            'dosens' => 'array|nullable'
         ]);
 
-        $totalBobot = array_sum($request->bobot);
-        if ($totalBobot != 100) {
-            return back()->with('error', 'Total bobot CPMK harus 100%');
-        }
+        $mataKuliah = MataKuliah::create($validated);
 
-        $mataKuliah = MataKuliah::findOrFail($kode_mk);
-        $kode_angkatan = $request->kode_angkatan;
-
-        // Hapus dulu bobot lama untuk mata kuliah + angkatan
-        $mataKuliah->cpmks()->wherePivot('kode_angkatan', $kode_angkatan)->detach();
-
-        // Simpan bobot baru
-        foreach ($request->cpmks as $kode_cpmk => $bobot) {
-            $mataKuliah->cpmks()->attach($kode_cpmk, [
-                'kode_angkatan' => $kode_angkatan,
-                'bobot' => $bobot
+        if ($request->has('dosens')) {
+            $mataKuliah->dosens()->attach($request->dosens, [
+                'kode_angkatan' => $request->kode_angkatan
             ]);
         }
 
-        return redirect()->route('mata_kuliahs.show', $kode_mk)
-            ->with('success', 'Bobot CPMK berhasil disimpan.');
+        return redirect()->route('mata_kuliahs.index')->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
+
+    public function edit($kode_mk)
+    {
+        $mataKuliah = MataKuliah::with('dosens')->findOrFail($kode_mk);
+        $prodis = Prodi::all();
+        $angkatans = Angkatan::all();
+        $dosens = Dosen::all();
+        $selectedDosens = $mataKuliah->dosens->pluck('nip')->toArray();
+
+        return view('mata_kuliahs.edit', compact('mataKuliah', 'prodis', 'angkatans', 'dosens', 'selectedDosens'));
+    }
+
+    public function update(Request $request, $kode_mk)
+    {
+        $mataKuliah = MataKuliah::findOrFail($kode_mk);
+
+        $validated = $request->validate([
+            'nama_mk' => 'required|string|max:100',
+            'kode_prodi' => 'required',
+            'kode_angkatan' => 'required',
+            'sks' => 'required|integer|min:1',
+            'dosens' => 'array|nullable'
+        ]);
+
+        $mataKuliah->update($validated);
+
+        $mataKuliah->dosens()->detach();
+        if ($request->has('dosens')) {
+            $mataKuliah->dosens()->attach($request->dosens, [
+                'kode_angkatan' => $request->kode_angkatan
+            ]);
+        }
+
+        return redirect()->route('mata_kuliahs.index')->with('success', 'Mata kuliah berhasil diperbarui.');
+    }
+
+    public function show($kode_mk)
+    {
+        $mataKuliah = MataKuliah::with(['prodi', 'angkatan', 'dosens', 'cpmks'])->findOrFail($kode_mk);
+
+        $angkatans = Angkatan::all();
+
+        $cpls = \App\Models\Cpl::where('kode_prodi', $mataKuliah->kode_prodi)->get();
+
+        $cpmks = \App\Models\Cpmk::whereHas('cpl', function ($query) use ($mataKuliah) {
+            $query->where('kode_prodi', $mataKuliah->kode_prodi);
+        })->get();
+
+        $cpmkMataKuliah = \DB::table('cpmk_mata_kuliah')
+            ->where('kode_mk', $kode_mk)
+            ->get();
+
+        return view('mata_kuliahs.show', compact('mataKuliah', 'angkatans', 'cpls', 'cpmks', 'cpmkMataKuliah'));
+    }
+
+
+    public function destroy($kode_mk)
+    {
+        $mataKuliah = MataKuliah::findOrFail($kode_mk);
+        $mataKuliah->dosens()->detach();
+        $mataKuliah->delete();
+
+        return redirect()->route('mata_kuliahs.index')->with('success', 'Mata kuliah berhasil dihapus.');
+    }
+
+    public function getCpmkByCpl($kode_cpl, $kode_mk)
+    {
+        $cpmks = \App\Models\Cpmk::where('kode_cpl', $kode_cpl)
+            ->get(['kode_cpmk']); // Hanya ambil kode_cpmk, tidak perlu deskripsi
+
+        return response()->json($cpmks);
+    }
+
+
+    public function getAngkatanByProdi(Request $request)
+    {
+        $angkatans = Angkatan::where('kode_prodi', $request->kode_prodi)
+            ->select('kode_angkatan', 'tahun')
+            ->get();
+
+        return response()->json($angkatans);
+    }
+
+    public function simpanBobot(Request $request, $kode_mk)
+    {
+        $validated = $request->validate([
+            'kode_angkatan' => 'required',
+            'kode_cpmk' => 'required',
+            'bobot' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $total = \DB::table('cpmk_mata_kuliah')
+            ->where('kode_mk', $kode_mk)
+            ->where('kode_angkatan', $validated['kode_angkatan'])
+            ->sum('bobot');
+
+        if ($total + $validated['bobot'] > 100) {
+            return redirect()->back()->withErrors(['bobot' => 'Total bobot CPMK tidak boleh lebih dari 100%']);
+        }
+
+        \DB::table('cpmk_mata_kuliah')->updateOrInsert(
+            [
+                'kode_mk' => $kode_mk,
+                'kode_angkatan' => $validated['kode_angkatan'],
+                'kode_cpmk' => $validated['kode_cpmk'],
+            ],
+            [
+                'bobot' => $validated['bobot'],
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Bobot CPMK berhasil disimpan.');
+    }
+
+    public function totalBobot($kode_mk, $kode_angkatan)
+    {
+        $total = \DB::table('cpmk_mata_kuliah')
+            ->where('kode_mk', $kode_mk)
+            ->where('kode_angkatan', $kode_angkatan)
+            ->sum('bobot');
+
+        return response()->json($total);
+    }
+
+    public function removeCpmk($id)
+    {
+        \DB::table('cpmk_mata_kuliah')->where('id', $id)->delete();
+        return redirect()->back()->with('success', 'Bobot CPMK berhasil dihapus.');
+    }
+
 }

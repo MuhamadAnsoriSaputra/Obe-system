@@ -22,16 +22,23 @@ class MataKuliah extends Model
         'sks',
     ];
 
+    /** =======================
+     *  RELASI
+     *  ======================= */
+
+    // Setiap mata kuliah milik satu prodi
     public function prodi()
     {
         return $this->belongsTo(Prodi::class, 'kode_prodi', 'kode_prodi');
     }
 
+    // Setiap mata kuliah bisa dipakai di satu angkatan
     public function angkatan()
     {
         return $this->belongsTo(Angkatan::class, 'kode_angkatan', 'kode_angkatan');
     }
 
+    // Relasi ke CPMK (many-to-many)
     public function cpmks()
     {
         return $this->belongsToMany(Cpmk::class, 'cpmk_mata_kuliah', 'kode_mk', 'kode_cpmk')
@@ -39,14 +46,11 @@ class MataKuliah extends Model
             ->withTimestamps();
     }
 
-
+    // Relasi ke dosen pengampu (many-to-many)
     public function dosens()
     {
-        return $this->belongsToMany(
-            Dosen::class,
-            'dosen_mata_kuliah',
-            'kode_mk',
-            'nip'
-        );
+        return $this->belongsToMany(Dosen::class, 'dosen_mata_kuliah', 'kode_mk', 'nip')
+            ->withPivot('kode_angkatan')
+            ->withTimestamps();
     }
 }
