@@ -18,25 +18,21 @@
                 <table class="table table-hover text-white">
                     <thead>
                         <tr>
+                            <th>Kode CPL</th>
                             <th>Kode CPMK</th>
                             <th>Deskripsi</th>
-                            <th>Kode CPL</th>
-                            <th>Program Studi</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($cpmks as $cpmk)
                             <tr>
+                                <td>{{ $cpmk->kode_cpl }}</td>
                                 <td>{{ $cpmk->kode_cpmk }}</td>
                                 <td>{{ $cpmk->deskripsi_cpmk }}</td>
-                                <td>{{ $cpmk->kode_cpl }}</td>
-                                <td>{{ $cpmk->cpl->prodi->nama_prodi ?? '-' }}</td>
                                 <td>
-                                    <a href="{{ route('cpmks.edit', $cpmk->kode_cpmk) }}"
-                                        class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="{{ route('cpmks.destroy', $cpmk->kode_cpmk) }}" method="POST"
-                                        class="d-inline">
+                                    <a href="{{ route('cpmks.edit', $cpmk->kode_cpmk) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form action="{{ route('cpmks.destroy', $cpmk->kode_cpmk) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-sm btn-danger"
@@ -46,7 +42,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-light">Belum ada CPMK</td>
+                                <td colspan="4" class="text-center text-light">Belum ada CPMK</td>
                             </tr>
                         @endforelse
                     </tbody>
