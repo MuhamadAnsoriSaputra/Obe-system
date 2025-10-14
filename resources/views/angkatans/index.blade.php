@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="container">
-        <h2 class="fw-bold mb-4">Manajemen Angkatan</h2>
+        <h2 class="fw-bold mb-4">Manajemen Kurikulum</h2>
 
         {{-- Alert Success --}}
         @if(session('success'))
@@ -17,7 +17,7 @@
         {{-- Tombol Tambah --}}
         <div class="mb-3">
             <a href="{{ route('angkatans.create') }}" class="btn btn-light fw-bold">
-                <i class="fas fa-plus me-2"></i> Tambah Angkatan
+                <i class="fas fa-plus me-2"></i> Tambah Kurikulum
             </a>
         </div>
 
@@ -27,7 +27,7 @@
                 <table class="table table-hover text-white">
                     <thead>
                         <tr>
-                            <th>Kode Angkatan</th>
+                            <th>Kode Kurikulum</th>
                             <th>Tahun</th>
                             <th>Program Studi</th>
                             <th>Aksi</th>
@@ -56,7 +56,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center">Belum ada Angkatan</td>
+                                <td colspan="4" class="text-center">Belum ada Kurikulum</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h2 class="fw-bold mb-4">Tambah Angkatan</h2>
+        <h2 class="fw-bold mb-4">Tambah Kurikulum</h2>
 
         <div class="card shadow-lg border-0"
             style="border-radius: 15px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); color:#fff;">
@@ -12,7 +12,7 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label for="kode_angkatan" class="form-label">Kode Angkatan</label>
+                        <label for="kode_angkatan" class="form-label">Kode Kurikulum</label>
                         <input type="text" name="kode_angkatan" id="kode_angkatan"
                             class="form-control @error('kode_angkatan') is-invalid @enderror"
                             value="{{ old('kode_angkatan') }}">

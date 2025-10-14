@@ -39,7 +39,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('angkatans.index') }}">
-                    <i class="fas fa-calendar-alt me-2"></i> Tahun Angkatan
+                    <i class="fas fa-calendar-alt me-2"></i> Tahun Kurikulum
                 </a>
             </li>
             <li class="nav-item">
