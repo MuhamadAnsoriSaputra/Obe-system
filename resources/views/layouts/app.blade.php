@@ -78,11 +78,6 @@
                     <i class="fas fa-diagram-project"></i> Rumusan
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('hasilobe.permatkul') }}">
-                    📘 Tampilan Per Matkul
-                </a>
-            </li>
         </ul>
     </div>
 

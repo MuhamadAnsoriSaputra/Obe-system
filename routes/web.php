@@ -61,6 +61,9 @@ Route::middleware('auth')->group(function () {
         'dosens' => DosenController::class,
     ]);
 
+    Route::get('/mahasiswas/{nim}/detail', [MahasiswaController::class, 'show'])
+        ->name('mahasiswas.show');
+
     // Mata Kuliah Detail / Bobot / CPMK
     Route::prefix('mata_kuliahs')->group(function () {
         Route::get('{kode_mk}', [MataKuliahController::class, 'show'])->name('mata_kuliahs.show');

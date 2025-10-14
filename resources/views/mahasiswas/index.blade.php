@@ -34,6 +34,7 @@
                                 <td>{{ $mhs->prodi->nama_prodi ?? '-' }}</td>
                                 <td>{{ $mhs->angkatan->tahun ?? '-' }}</td>
                                 <td>
+                                    <a href="{{ route('mahasiswas.show', $mhs->nim) }}" class="btn btn-sm btn-info">Detail</a>
                                     <a href="{{ route('mahasiswas.edit', $mhs->nim) }}" class="btn btn-sm btn-warning">Edit</a>
                                     <form action="{{ route('mahasiswas.destroy', $mhs->nim) }}" method="POST" class="d-inline">
                                         @csrf

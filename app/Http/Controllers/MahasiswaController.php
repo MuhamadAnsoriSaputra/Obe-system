@@ -122,4 +122,28 @@ class MahasiswaController extends Controller
 
         return redirect()->route('mahasiswas.index')->with('success', 'Mahasiswa berhasil dihapus');
     }
+
+    public function show($nim)
+    {
+        // Ambil data mahasiswa berdasarkan NIM
+        $mahasiswa = Mahasiswa::with(['prodi', 'angkatan'])->where('nim', $nim)->firstOrFail();
+
+        // Ambil nilai mahasiswa dari tabel penilaians
+        $nilai = \DB::table('penilaians')
+            ->join('mata_kuliahs', 'penilaians.kode_mk', '=', 'mata_kuliahs.kode_mk')
+            ->join('cpls', 'penilaians.kode_cpl', '=', 'cpls.kode_cpl')
+            ->join('cpmks', 'penilaians.kode_cpmk', '=', 'cpmks.kode_cpmk')
+            ->select(
+                'mata_kuliahs.nama_mk',
+                'cpls.kode_cpl',
+                'cpmks.kode_cpmk',
+                'penilaians.skor_maks',
+                'penilaians.nilai_perkuliahan'
+            )
+            ->where('penilaians.nim', $nim)
+            ->get();
+
+        return view('mahasiswas.show', compact('mahasiswa', 'nilai'));
+    }
+
 }
