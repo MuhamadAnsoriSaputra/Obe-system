@@ -136,6 +136,11 @@ class MataKuliahController extends Controller
             'bobot' => 'required|numeric|min:0|max:100',
         ]);
 
+        // ✅ 1. Ambil objek CPMK beserta CPL-nya
+        $cpmk = \App\Models\Cpmk::with('cpl')->where('kode_cpmk', $validated['kode_cpmk'])->firstOrFail();
+        $kode_cpl = $cpmk->kode_cpl;
+
+        // ✅ 2. Pastikan total bobot ≤ 100%
         $total = \DB::table('cpmk_mata_kuliah')
             ->where('kode_mk', $kode_mk)
             ->where('kode_angkatan', $validated['kode_angkatan'])
@@ -145,6 +150,7 @@ class MataKuliahController extends Controller
             return redirect()->back()->withErrors(['bobot' => 'Total bobot CPMK tidak boleh lebih dari 100%']);
         }
 
+        // ✅ 3. Simpan / update bobot CPMK
         \DB::table('cpmk_mata_kuliah')->updateOrInsert(
             [
                 'kode_mk' => $kode_mk,
@@ -158,8 +164,22 @@ class MataKuliahController extends Controller
             ]
         );
 
-        return redirect()->back()->with('success', 'Bobot CPMK berhasil disimpan.');
+        // ✅ 4. Otomatis mapping ke pivot `cpl_mata_kuliah`
+        \DB::table('cpl_mata_kuliah')->updateOrInsert(
+            [
+                'kode_mk' => $kode_mk,
+                'kode_cpl' => $kode_cpl,
+                'kode_angkatan' => $validated['kode_angkatan'],
+            ],
+            [
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
+
+        return redirect()->back()->with('success', 'Bobot CPMK berhasil disimpan dan mapping CPL otomatis dibuat.');
     }
+
 
     public function totalBobot($kode_mk, $kode_angkatan)
     {

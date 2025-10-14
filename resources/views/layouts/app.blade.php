@@ -68,6 +68,21 @@
                     <i class="fas fa-book"></i> Mata Kuliah
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{ url('/penilaian') }}" class="nav-link {{ request()->is('penilaian*') ? 'active' : '' }}">
+                    <i class="fas fa-clipboard-check"></i> Penilaian
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url('/rumusan') }}" class="nav-link {{ request()->is('rumusan*') ? 'active' : '' }}">
+                    <i class="fas fa-diagram-project"></i> Rumusan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('hasilobe.permatkul') }}">
+                    📘 Tampilan Per Matkul
+                </a>
+            </li>
         </ul>
     </div>
 

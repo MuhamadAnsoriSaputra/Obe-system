@@ -53,4 +53,11 @@ class MataKuliah extends Model
             ->withPivot('kode_angkatan')
             ->withTimestamps();
     }
+
+    public function cpls()
+    {
+        return $this->belongsToMany(Cpl::class, 'cpl_mata_kuliah', 'kode_mk', 'kode_cpl')
+            ->withPivot('kode_angkatan')
+            ->withTimestamps();
+    }
 }

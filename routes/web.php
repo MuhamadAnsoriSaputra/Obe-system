@@ -12,6 +12,8 @@ use App\Http\Controllers\CpmkController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RumusanController;
+use App\Http\Controllers\PenilaianController;
 
 // Model
 use App\Models\User;
@@ -76,4 +78,15 @@ Route::middleware('auth')->group(function () {
         Route::get('cpmk-mk-total/{kode_mk}/{kode_angkatan}', [MataKuliahController::class, 'totalBobot']);
     });
 
+    Route::get('/rumusan', [RumusanController::class, 'index'])->name('rumusan.index');
+    Route::get('/rumusan/matkul', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.matkul');
+    Route::get('/rumusan/mata_kuliah', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.mata_kuliah');
+    Route::get('/rumusan/cpl', [RumusanController::class, 'rumusanCpl'])->name('rumusan.cpl');
+    Route::get('/rumusan/cpl', [RumusanController::class, 'rumusanCpl'])->name('rumusan.cpl');
+
+    Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
+    Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
+    Route::post('/penilaian/{kode_mk}/store', [PenilaianController::class, 'store'])->name('penilaian.store');
+
+    Route::get('/hasil-obe/per-matkul', [App\Http\Controllers\HasilObeController::class, 'perMatkul'])->name('hasilobe.permatkul');
 });

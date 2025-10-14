@@ -12,7 +12,6 @@ return new class extends Migration {
             $table->string('kode_cpl', 20);
             $table->string('kode_mk', 20);
             $table->string('kode_angkatan', 20);
-            $table->decimal('bobot', 5, 2)->default(0);
             $table->timestamps();
 
             $table->foreign('kode_cpl')

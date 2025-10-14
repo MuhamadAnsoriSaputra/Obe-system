@@ -5,39 +5,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Penilaian extends Model
+class CplMataKuliah extends Model
 {
     use HasFactory;
 
+    protected $table = 'cpl_mata_kuliah';
+
     protected $fillable = [
-        'nim',
-        'kode_mk',
         'kode_cpl',
-        'kode_cpmk',
+        'kode_mk',
         'kode_angkatan',
-        'skor_maks',
-        'nilai_perkuliahan',
-        'nilai',
     ];
 
-    public function mahasiswa()
-    {
-        return $this->belongsTo(Mahasiswa::class, 'nim', 'nim');
-    }
-
-    public function mataKuliah()
-    {
-        return $this->belongsTo(MataKuliah::class, 'kode_mk', 'kode_mk');
-    }
+    /** =======================
+     *  RELASI
+     *  ======================= */
 
     public function cpl()
     {
         return $this->belongsTo(Cpl::class, 'kode_cpl', 'kode_cpl');
     }
 
-    public function cpmk()
+    public function mataKuliah()
     {
-        return $this->belongsTo(Cpmk::class, 'kode_cpmk', 'kode_cpmk');
+        return $this->belongsTo(MataKuliah::class, 'kode_mk', 'kode_mk');
     }
 
     public function angkatan()
