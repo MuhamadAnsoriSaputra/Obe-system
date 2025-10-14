@@ -14,11 +14,9 @@ class MahasiswaController extends Controller
     {
         $user = Auth::user();
 
-        // Jika role akademik → hanya tampilkan mahasiswa dari prodi-nya
         if ($user->role === 'akademik') {
             $mahasiswas = Mahasiswa::where('kode_prodi', $user->kode_prodi)->paginate(10);
         } else {
-            // Admin bisa lihat semua mahasiswa
             $mahasiswas = Mahasiswa::paginate(10);
         }
 
@@ -30,7 +28,6 @@ class MahasiswaController extends Controller
         $user = Auth::user();
         $angkatans = Angkatan::all();
 
-        // Jika akademik → tidak perlu pilih prodi (otomatis)
         if ($user->role === 'akademik') {
             $prodis = Prodi::where('kode_prodi', $user->kode_prodi)->get();
         } else {
@@ -56,8 +53,8 @@ class MahasiswaController extends Controller
             'nama' => $request->nama,
             'email' => $request->email,
             'kode_prodi' => $user->role === 'akademik'
-                ? $user->kode_prodi  // otomatis isi dari user login
-                : $request->kode_prodi, // admin bisa pilih
+                ? $user->kode_prodi
+                : $request->kode_prodi,
             'kode_angkatan' => $request->kode_angkatan,
         ]);
 
@@ -71,7 +68,6 @@ class MahasiswaController extends Controller
         $angkatans = Angkatan::all();
 
         if ($user->role === 'akademik') {
-            // pastikan hanya bisa edit mahasiswa dari prodi sendiri
             if ($mahasiswa->kode_prodi !== $user->kode_prodi) {
                 abort(403, 'Anda tidak memiliki izin untuk mengedit mahasiswa prodi lain.');
             }
@@ -88,14 +84,12 @@ class MahasiswaController extends Controller
         $mahasiswa = Mahasiswa::findOrFail($nim);
         $user = Auth::user();
 
-        // validasi dasar
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:mahasiswas,email,' . $nim . ',nim',
             'kode_angkatan' => 'required|exists:angkatans,kode_angkatan',
         ]);
 
-        // pastikan akademik hanya bisa update prodi-nya sendiri
         if ($user->role === 'akademik' && $mahasiswa->kode_prodi !== $user->kode_prodi) {
             abort(403, 'Anda tidak memiliki izin untuk memperbarui mahasiswa prodi lain.');
         }
@@ -125,16 +119,16 @@ class MahasiswaController extends Controller
 
     public function show($nim)
     {
-        // Ambil data mahasiswa berdasarkan NIM
         $mahasiswa = Mahasiswa::with(['prodi', 'angkatan'])->where('nim', $nim)->firstOrFail();
 
-        // Ambil nilai mahasiswa dari tabel penilaians
+        // Tabel Nilai per Mata Kuliah
         $nilai = \DB::table('penilaians')
             ->join('mata_kuliahs', 'penilaians.kode_mk', '=', 'mata_kuliahs.kode_mk')
             ->join('cpls', 'penilaians.kode_cpl', '=', 'cpls.kode_cpl')
             ->join('cpmks', 'penilaians.kode_cpmk', '=', 'cpmks.kode_cpmk')
             ->select(
                 'mata_kuliahs.nama_mk',
+                'penilaians.kode_mk',
                 'cpls.kode_cpl',
                 'cpmks.kode_cpmk',
                 'penilaians.skor_maks',
@@ -143,7 +137,16 @@ class MahasiswaController extends Controller
             ->where('penilaians.nim', $nim)
             ->get();
 
-        return view('mahasiswas.show', compact('mahasiswa', 'nilai'));
-    }
+        // Group by CPL dan hitung persentase
+        $nilai_per_cpl = $nilai->groupBy('kode_cpl');
+        $capaian_cpl = [];
 
+        foreach ($nilai_per_cpl as $cpl => $items) {
+            $total_skor = $items->sum('skor_maks');
+            $total_nilai = $items->sum('nilai_perkuliahan');
+            $capaian_cpl[$cpl] = $total_skor > 0 ? round(($total_nilai / $total_skor) * 100, 2) : 0;
+        }
+
+        return view('mahasiswas.show', compact('mahasiswa', 'nilai', 'nilai_per_cpl', 'capaian_cpl'));
+    }
 }
