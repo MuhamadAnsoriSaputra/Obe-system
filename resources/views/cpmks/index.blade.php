@@ -4,9 +4,18 @@
     <div class="container">
         <h2 class="fw-bold mb-4">Manajemen CPMK</h2>
 
-        <a href="{{ route('cpmks.create') }}" class="btn btn-light fw-bold mb-3">
-            <i class="fas fa-plus"></i> Tambah CPMK
-        </a>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ route('cpmks.create') }}" class="btn btn-light fw-bold">
+                <i class="fas fa-plus"></i> Tambah CPMK
+            </a>
+
+            <form action="{{ route('cpmks.index') }}" method="GET" class="d-flex" role="search">
+                <input type="text" name="search" class="form-control me-2"
+                       placeholder="Cari kode CPMK / CPL / deskripsi..."
+                       value="{{ request('search') }}">
+                <button class="btn btn-outline-light" type="submit">Cari</button>
+            </form>
+        </div>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -47,7 +56,9 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $cpmks->links() }}
+
+                {{-- Pagination tetap membawa parameter search --}}
+                {{ $cpmks->appends(['search' => request('search')])->links() }}
             </div>
         </div>
     </div>

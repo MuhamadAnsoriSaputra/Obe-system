@@ -9,21 +9,37 @@ use Illuminate\Support\Facades\Auth;
 
 class CpmkController extends Controller
 {
-    public function index()
-    {
-        $user = Auth::user();
+    public function index(Request $request)
+{
+    $user = Auth::user();
+    $search = $request->input('search'); // ambil input pencarian
 
-        // Filter CPMK berdasarkan prodi akademik
-        if ($user->role === 'akademik' && $user->kode_prodi) {
-            $cpmks = Cpmk::whereHas('cpl', function ($query) use ($user) {
-                $query->where('kode_prodi', $user->kode_prodi);
-            })->with('cpl')->paginate(10);
-        } else {
-            $cpmks = Cpmk::with('cpl')->paginate(10);
-        }
+    // Query dasar CPMK + relasi CPL
+    $query = Cpmk::with('cpl');
 
-        return view('cpmks.index', compact('cpmks'));
+    // Filter prodi akademik
+    if ($user->role === 'akademik' && $user->kode_prodi) {
+        $query->whereHas('cpl', function ($q) use ($user) {
+            $q->where('kode_prodi', $user->kode_prodi);
+        });
     }
+
+    // Filter berdasarkan kata kunci
+    if (!empty($search)) {
+        $query->where(function ($q) use ($search) {
+            $q->where('kode_cpmk', 'like', "%{$search}%")
+              ->orWhere('deskripsi_cpmk', 'like', "%{$search}%")
+              ->orWhereHas('cpl', function ($sub) use ($search) {
+                  $sub->where('kode_cpl', 'like', "%{$search}%");
+              });
+        });
+    }
+
+    $cpmks = $query->paginate(10);
+
+    return view('cpmks.index', compact('cpmks', 'search'));
+}
+
 
     public function create()
     {
