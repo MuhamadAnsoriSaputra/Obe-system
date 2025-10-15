@@ -9,10 +9,25 @@ use Illuminate\Http\Request;
 
 class DosenController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $dosens = Dosen::with(['prodi', 'user'])->paginate(10);
-        return view('dosens.index', compact('dosens'));
+        $search = $request->input('search');
+
+        $dosens = Dosen::with(['prodi', 'user'])
+            ->when($search, function ($query) use ($search) {
+                $query->where('nip', 'like', "%{$search}%")
+                    ->orWhere('nama', 'like', "%{$search}%")
+                    ->orWhere('gelar', 'like', "%{$search}%")
+                    ->orWhere('jabatan', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
+            })
+            ->paginate(10);
+
+        $dosens->appends(['search' => $search]);
+
+        return view('dosens.index', compact('dosens', 'search'));
     }
 
     public function create()
