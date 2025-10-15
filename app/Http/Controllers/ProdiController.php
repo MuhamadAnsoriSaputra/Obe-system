@@ -7,11 +7,21 @@ use Illuminate\Http\Request;
 
 class ProdiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $prodis = Prodi::orderBy('created_at', 'desc')->paginate(10);
-        return view('prodis.index', compact('prodis'));
+        $keyword = $request->input('search');
+
+        $prodis = Prodi::when($keyword, function ($query) use ($keyword) {
+            $query->where('kode_prodi', 'like', "%$keyword%")
+                ->orWhere('nama_prodi', 'like', "%$keyword%")
+                ->orWhere('jenjang', 'like', "%$keyword%");
+        })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('prodis.index', compact('prodis', 'keyword'));
     }
+
 
     public function create()
     {
