@@ -30,16 +30,19 @@
                                 <td>{{ $prodi->nama_prodi }}</td>
                                 <td>{{ $prodi->jenjang }}</td>
                                 <td>
-                                    <a href="{{ route('prodis.edit', $prodi->kode_prodi) }}"
-                                        class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="{{ route('prodis.edit', $prodi->kode_prodi) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     <form action="{{ route('prodis.destroy', $prodi->kode_prodi) }}" method="POST"
-                                        class="d-inline">
+                                        class="d-inline" onsubmit="return confirm('Yakin hapus prodi ini?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Yakin hapus prodi ini?')">Hapus</button>
+                                        <button class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </form>
                                 </td>
+
                             </tr>
                         @empty
                             <tr>
