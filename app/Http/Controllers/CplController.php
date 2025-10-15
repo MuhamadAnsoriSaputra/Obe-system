@@ -10,20 +10,29 @@ use Illuminate\Support\Facades\Auth;
 
 class CplController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $search = $request->input('search');
 
-        if ($user->role === 'akademik' && $user->kode_prodi) {
-            $cpls = Cpl::where('kode_prodi', $user->kode_prodi)
-                ->with(['angkatan'])
-                ->paginate(10);
-        } else {
-            $cpls = Cpl::with(['prodi', 'angkatan'])->paginate(10);
-        }
+        $cpls = Cpl::with(['prodi', 'angkatan'])
+            ->when($user->role === 'akademik' && $user->kode_prodi, function ($query) use ($user) {
+                $query->where('kode_prodi', $user->kode_prodi);
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->where('kode_cpl', 'like', "%{$search}%")
+                    ->orWhere('deskripsi', 'like', "%{$search}%")
+                    ->orWhereHas('angkatan', function ($q) use ($search) {
+                        $q->where('tahun', 'like', "%{$search}%");
+                    });
+            })
+            ->paginate(10);
+
+        $cpls->appends(['search' => $search]);
 
         return view('cpls.index', compact('cpls'));
     }
+
 
     public function create()
     {
