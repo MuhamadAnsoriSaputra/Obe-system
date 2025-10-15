@@ -10,9 +10,21 @@ use Illuminate\Http\Request;
 
 class MataKuliahController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $mataKuliahs = MataKuliah::with(['prodi', 'angkatan', 'dosens'])->paginate(10);
+        $query = MataKuliah::with(['prodi', 'angkatan', 'dosens']);
+
+        // Jika ada input pencarian
+        if ($request->has('search') && $request->search != '') {
+            $query->where('nama_mk', 'like', '%' . $request->search . '%')
+                ->orWhere('kode_mk', 'like', '%' . $request->search . '%');
+        }
+
+        $mataKuliahs = $query->paginate(10);
+
+        // Tetap membawa kata kunci pencarian saat pagination
+        $mataKuliahs->appends($request->only('search'));
+
         return view('mata_kuliahs.index', compact('mataKuliahs'));
     }
 
