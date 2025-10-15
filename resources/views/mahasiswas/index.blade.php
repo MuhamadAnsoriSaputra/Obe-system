@@ -33,15 +33,25 @@
                                 <td>{{ $mhs->email }}</td>
                                 <td>{{ $mhs->prodi->nama_prodi ?? '-' }}</td>
                                 <td>{{ $mhs->angkatan->tahun ?? '-' }}</td>
-                                <td>
-                                    <a href="{{ route('mahasiswas.show', $mhs->nim) }}" class="btn btn-sm btn-info">Detail</a>
-                                    <a href="{{ route('mahasiswas.edit', $mhs->nim) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="{{ route('mahasiswas.destroy', $mhs->nim) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Yakin hapus?')">Hapus</button>
-                                    </form>
+                                <td class="text-nowrap">
+                                    <div class="d-flex gap-1">
+                                        <a href="{{ route('mahasiswas.show', $mhs->nim) }}"
+                                            class="btn btn-sm btn-info px-2 py-1">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('mahasiswas.edit', $mhs->nim) }}"
+                                            class="btn btn-sm btn-warning px-2 py-1">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('mahasiswas.destroy', $mhs->nim) }}" method="POST"
+                                            class="d-inline-flex" onsubmit="return confirm('Yakin hapus?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger px-2 py-1">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
