@@ -50,7 +50,7 @@
                 <div class="d-flex justify-content-end">
                     <a href="{{ route('prodis.index') }}" class="btn btn-secondary me-2">Batal</a>
                     <button type="submit" class="btn btn-light fw-bold px-4">
-                        <i class="fas fa-save me-2"></i> Simpan
+                        <i class="fas fa-save me-2"></i> Simpan Perubahan
                     </button>
                 </div>
             </form>
