@@ -11,10 +11,32 @@
             </div>
         @endif
 
-        <div class="mb-3">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
             <a href="{{ route('users.create') }}" class="btn btn-light fw-bold">
                 <i class="fas fa-user-plus me-2"></i> Tambah Pengguna
             </a>
+
+            <form action="{{ route('users.index') }}" method="GET" class="d-flex align-items-center" role="search">
+                <div class="d-flex align-items-center"
+                    style="background: #ffffff; padding:2px 10px; border-radius: 25px; max-width:250px; height:32px;">
+                    <i class="fas fa-search me-2 text-dark" style="font-size: 13px;"></i>
+                    <input type="text" name="search" class="form-control border-0 bg-transparent text-dark"
+                        placeholder="Cari pengguna..." style="box-shadow:none; height:28px; padding:0; font-size: 14px;"
+                        value="{{ request('search') }}">
+                </div>
+                <button type="submit"
+                    class="btn ms-2 px-4 rounded-pill fw-semibold d-flex align-items-center justify-content-center"
+                    style="height:32px; line-height: 1; border:1px solid rgba(255,255,255,0.6); background:transparent; color:white; transition:0.3s;">
+                    Cari
+                </button>
+
+                <style>
+                    button[type="submit"]:hover {
+                        background: rgba(255, 255, 255, 0.2);
+                        border-color: white;
+                    }
+                </style>
+            </form>
         </div>
 
         <div class="card shadow-lg border-0">
