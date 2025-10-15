@@ -2,53 +2,74 @@
 
 @section('content')
     <div class="container">
-        <h2 class="fw-bold mb-4">Rumusan Akhir CPL</h2>
+        <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+            <div class="card-header fw-bold" style="background: #f5f5f5;">
+                <h4 class="mb-0">Rumusan Akhir CPL</h4>
+            </div>
+            <div class="card-body p-4">
 
-        <table class="table table-bordered align-middle text-center">
-            <thead class="table-warning">
-                <tr>
-                    <th>CPL</th>
-                    <th>MK</th>
-                    <th>CPMK</th>
-                    <th>Skor Maks</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($cpls as $cpl)
-                    @php
-                        $rows = $cpl->cpmks->flatMap(function ($cpmk) {
-                            return $cpmk->mataKuliahs->map(function ($mk) use ($cpmk) {
-                                return [
-                                    'mk' => $mk->kode_mk,
-                                    'cpmk' => $cpmk->kode_cpmk,
-                                    'bobot' => $mk->pivot->bobot ?? 0,
-                                ];
-                            });
-                        });
-                        $totalBobot = $rows->sum('bobot');
-                    @endphp
-
-                    @foreach($rows as $index => $row)
+                <table class="table table-hover table-bordered text-center align-middle"
+                    style="border-radius: 10px; overflow: hidden;">
+                    <thead style="background: #fafafa; font-weight: 600;">
                         <tr>
-                            @if($index == 0)
-                                <td rowspan="{{ $rows->count() }}" class="table-light fw-bold align-middle">
-                                    {{ $cpl->kode_cpl }}
-                                </td>
-                            @endif
-                            <td>{{ $row['mk'] }}</td>
-                            <td>{{ $row['cpmk'] }}</td>
-                            <td>{{ $row['bobot'] }}</td>
-
-                            @if($index == 0)
-                                <td rowspan="{{ $rows->count() }}" class="table-light fw-bold align-middle">
-                                    {{ number_format($totalBobot, 1) }}
-                                </td>
-                            @endif
+                            <th>CPL</th>
+                            <th>MK</th>
+                            <th>CPMK</th>
+                            <th>Skor Maks</th>
+                            <th>Total</th>
                         </tr>
-                    @endforeach
-                @endforeach
-            </tbody>
-        </table>
+                    </thead>
+                    <tbody>
+                        @foreach($cpls as $cpl)
+                            @php
+                                $rows = $cpl->cpmks->flatMap(function ($cpmk) {
+                                    return $cpmk->mataKuliahs->map(function ($mk) use ($cpmk) {
+                                        return [
+                                            'mk' => $mk->kode_mk,
+                                            'cpmk' => $cpmk->kode_cpmk,
+                                            'bobot' => $mk->pivot->bobot ?? 0,
+                                        ];
+                                    });
+                                });
+                                $totalBobot = $rows->sum('bobot');
+                            @endphp
+
+                            @foreach($rows as $index => $row)
+                                <tr>
+                                    @if($index == 0)
+                                        <td rowspan="{{ $rows->count() }}" class="fw-semibold" style="background: #fcfcfc;">
+                                            {{ $cpl->kode_cpl }}
+                                        </td>
+                                    @endif
+
+                                    <td>
+                                        <span class="badge px-3 py-2"
+                                            style="background: #e8f1f5; color: #556b7a; font-weight: 500;">
+                                            {{ $row['mk'] }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge px-3 py-2"
+                                            style="background: #f0e8d8; color: #6d5b3e; font-weight: 500;">
+                                            {{ $row['cpmk'] }}
+                                        </span>
+                                    </td>
+
+                                    <td class="fw-semibold">{{ $row['bobot'] }}</td>
+
+                                    @if($index == 0)
+                                        <td rowspan="{{ $rows->count() }}" class="fw-semibold" style="background: #fcfcfc;">
+                                            {{ number_format($totalBobot, 1) }}
+                                        </td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        @endforeach
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
     </div>
 @endsection
