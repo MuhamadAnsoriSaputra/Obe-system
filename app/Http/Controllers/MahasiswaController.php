@@ -10,18 +10,30 @@ use Illuminate\Support\Facades\Auth;
 
 class MahasiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $search = $request->input('search');
 
-        if ($user->role === 'akademik') {
-            $mahasiswas = Mahasiswa::where('kode_prodi', $user->kode_prodi)->paginate(10);
-        } else {
-            $mahasiswas = Mahasiswa::paginate(10);
-        }
+        $mahasiswas = Mahasiswa::with(['prodi', 'angkatan'])
+            ->when($user->role === 'akademik', function ($query) use ($user) {
+                $query->where('kode_prodi', $user->kode_prodi);
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->where('nim', 'like', "%{$search}%")
+                    ->orWhere('nama', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhereHas('angkatan', function ($q) use ($search) {
+                        $q->where('tahun', 'like', "%{$search}%");
+                    });
+            })
+            ->paginate(10);
 
-        return view('mahasiswas.index', compact('mahasiswas'));
+        $mahasiswas->appends(['search' => $search]);
+
+        return view('mahasiswas.index', compact('mahasiswas', 'search'));
     }
+
 
     public function create()
     {
