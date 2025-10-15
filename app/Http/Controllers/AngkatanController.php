@@ -8,9 +8,23 @@ use App\Models\Prodi;
 
 class AngkatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $angkatans = Angkatan::with('prodi')->latest()->paginate(10);
+        $search = $request->input('search'); // Tangkap query pencarian
+
+        $angkatans = Angkatan::with('prodi')
+            ->when($search, function ($query) use ($search) {
+                $query->where('kode_angkatan', 'like', "%{$search}%")
+                    ->orWhere('tahun', 'like', "%{$search}%")
+                    ->orWhereHas('prodi', function ($q) use ($search) {
+                        $q->where('nama_prodi', 'like', "%{$search}%");
+                    });
+            })
+            ->latest()
+            ->paginate(10);
+
+        $angkatans->appends(['search' => $search]); // Agar pagination ikut membawa search
+
         return view('angkatans.index', compact('angkatans'));
     }
 
