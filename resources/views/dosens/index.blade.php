@@ -34,13 +34,15 @@
                                 <td>{{ $dosen->jabatan ?? '-' }}</td>
                                 <td>{{ $dosen->prodi->nama_prodi ?? '-' }}</td>
                                 <td>
-                                    <a href="{{ route('dosens.edit', $dosen->nip) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="{{ route('dosens.destroy', $dosen->nip) }}" method="POST" class="d-inline">
+                                    <a href="{{ route('dosens.edit', $dosen->nip) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('dosens.destroy', $dosen->nip) }}" method="POST" class="d-inline"
+                                        onsubmit="return confirm('Yakin hapus dosen ini?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Yakin hapus dosen ini?')">
-                                            Hapus
+                                        <button class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
                                 </td>
