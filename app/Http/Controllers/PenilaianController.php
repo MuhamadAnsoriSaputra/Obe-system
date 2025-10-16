@@ -6,28 +6,23 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\MataKuliah;
 use App\Models\Penilaian;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PenilaianExport;
+use App\Imports\PenilaianImport;
 
 class PenilaianController extends Controller
 {
     public function index()
     {
-        // Ambil semua mata kuliah dari tabel
         $mataKuliahs = MataKuliah::paginate(10);
-
-
-        // Kirim ke view penilaian.index
         return view('penilaian.index', compact('mataKuliahs'));
     }
 
     public function input($kode_mk)
     {
-        // Ambil data mata kuliah
         $matakuliah = MataKuliah::where('kode_mk', $kode_mk)->firstOrFail();
-
-        // Ambil salah satu angkatan (sementara, bisa disesuaikan dari session/dosen nanti)
         $kode_angkatan = DB::table('mahasiswas')->value('kode_angkatan');
 
-        // Ambil data CPL yang terhubung ke MK dan angkatan
         $cpl = DB::table('cpls')
             ->join('cpl_mata_kuliah', 'cpls.kode_cpl', '=', 'cpl_mata_kuliah.kode_cpl')
             ->select('cpls.kode_cpl', 'cpls.deskripsi', 'cpl_mata_kuliah.kode_angkatan')
@@ -35,7 +30,6 @@ class PenilaianController extends Controller
             ->where('cpl_mata_kuliah.kode_angkatan', $kode_angkatan)
             ->get();
 
-        // Ambil data CPMK yang terhubung dengan CPL dan MK
         $cpmk = DB::table('cpmks')
             ->join('cpmk_mata_kuliah', 'cpmks.kode_cpmk', '=', 'cpmk_mata_kuliah.kode_cpmk')
             ->select(
@@ -66,11 +60,8 @@ class PenilaianController extends Controller
             ]);
         }
 
-        // ================================
-        // 🔸 Hitung & simpan capaian CPL
-        // ================================
+        // Hitung capaian CPL
         $nim = $request->nim;
-
         $cplData = DB::table('penilaians')
             ->select(
                 'kode_cpl',
@@ -82,25 +73,36 @@ class PenilaianController extends Controller
             ->get();
 
         foreach ($cplData as $row) {
-            $capaian = 0;
-            if ($row->total_skor > 0) {
-                $capaian = ($row->total_nilai / $row->total_skor) * 100;
-            }
+            $capaian = $row->total_skor > 0 ? ($row->total_nilai / $row->total_skor) * 100 : 0;
 
-            // Simpan ke tabel hasil_obes (update kalau sudah ada)
             DB::table('hasil_obes')->updateOrInsert(
-                [
-                    'nim' => $nim,
-                    'kode_cpl' => $row->kode_cpl,
-                ],
-                [
-                    'capaian_persentase' => $capaian,
-                    'updated_at' => now(),
-                    'created_at' => now(),
-                ]
+                ['nim' => $nim, 'kode_cpl' => $row->kode_cpl],
+                ['capaian_persentase' => $capaian, 'updated_at' => now(), 'created_at' => now()]
             );
         }
 
         return redirect()->back()->with('success', 'Data nilai dan capaian CPL berhasil disimpan!');
+    }
+
+    // =====================================================
+    // 📤 EXPORT EXCEL
+    // =====================================================
+    public function export()
+    {
+        return Excel::download(new PenilaianExport, 'penilaian.xlsx');
+    }
+
+    // =====================================================
+    // 📥 IMPORT EXCEL
+    // =====================================================
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        Excel::import(new PenilaianImport, $request->file('file'));
+
+        return back()->with('success', 'Data penilaian berhasil diimpor!');
     }
 }

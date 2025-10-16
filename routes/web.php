@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Controller
+// Controllers
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\AngkatanController;
@@ -14,30 +14,37 @@ use App\Http\Controllers\DosenController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RumusanController;
 use App\Http\Controllers\PenilaianController;
+use App\Http\Controllers\HasilObeController;
 
-// Model
+// Models
 use App\Models\User;
 use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use App\Models\MataKuliah;
 use App\Models\Prodi;
 
-// ----------------------
-// Public Routes
-// ----------------------
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Default redirect
+// Default redirect ke dashboard
 Route::get('/', fn() => redirect()->route('dashboard'));
 
-// ----------------------
-// Protected Routes (auth)
-// ----------------------
+/*
+|--------------------------------------------------------------------------
+| Protected Routes (auth)
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
 
-    // Dashboard
+    // =======================
+    // DASHBOARD
+    // =======================
     Route::get('/dashboard', function () {
         $stats = [
             'users' => User::count(),
@@ -49,7 +56,9 @@ Route::middleware('auth')->group(function () {
         return view('dashboard', compact('stats'));
     })->name('dashboard');
 
-    // Resource CRUD
+    // =======================
+    // CRUD RESOURCE
+    // =======================
     Route::resources([
         'users' => UserController::class,
         'prodis' => ProdiController::class,
@@ -61,10 +70,13 @@ Route::middleware('auth')->group(function () {
         'dosens' => DosenController::class,
     ]);
 
+    // Detail mahasiswa
     Route::get('/mahasiswas/{nim}/detail', [MahasiswaController::class, 'show'])
         ->name('mahasiswas.show');
 
-    // Mata Kuliah Detail / Bobot / CPMK
+    // =======================
+    // MATA KULIAH DETAIL
+    // =======================
     Route::prefix('mata_kuliahs')->group(function () {
         Route::get('{kode_mk}', [MataKuliahController::class, 'show'])->name('mata_kuliahs.show');
         Route::post('{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
@@ -73,23 +85,46 @@ Route::middleware('auth')->group(function () {
         Route::put('{kode_mk}/update-cpmk', [MataKuliahController::class, 'updateCpmk'])->name('mata_kuliahs.updateCpmk');
     });
 
-    // AJAX / API Routes
+    // =======================
+    // PENILAIAN (OBE)
+    // =======================
+    Route::prefix('penilaian')->group(function () {
+        // 📋 Halaman daftar mata kuliah
+        Route::get('/', [PenilaianController::class, 'index'])->name('penilaian.index');
+
+        // 📝 Input penilaian per mata kuliah
+        Route::get('/input/{kode_mk}', [PenilaianController::class, 'input'])->name('penilaian.input');
+
+        // 💾 Simpan hasil penilaian
+        Route::post('/store/{kode_mk}', [PenilaianController::class, 'store'])->name('penilaian.store');
+
+        // 📤 Export dan 📥 Import Excel
+        Route::get('/export', [PenilaianController::class, 'export'])->name('penilaian.export');
+        Route::post('/import', [PenilaianController::class, 'import'])->name('penilaian.import');
+    });
+
+    // =======================
+    // RUMUSAN OBE
+    // =======================
+    Route::prefix('rumusan')->group(function () {
+        Route::get('/', [RumusanController::class, 'index'])->name('rumusan.index');
+        Route::get('/matkul', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.matkul');
+        Route::get('/mata_kuliah', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.mata_kuliah');
+        Route::get('/cpl', [RumusanController::class, 'rumusanCpl'])->name('rumusan.cpl');
+    });
+
+    // =======================
+    // HASIL OBE
+    // =======================
+    Route::get('/hasil-obe/per-matkul', [HasilObeController::class, 'perMatkul'])->name('hasilobe.permatkul');
+
+    // =======================
+    // ROUTE API / AJAX
+    // =======================
     Route::prefix('api')->group(function () {
         Route::get('cpl/by-angkatan/{kode_angkatan}/{kode_prodi}', [CpmkController::class, 'getCplByAngkatan']);
         Route::get('cpmks/{kode_cpl}/{kode_mk}', [MataKuliahController::class, 'getCpmkByCpl']);
         Route::get('angkatan/by-prodi/{kode_prodi}', [AngkatanController::class, 'getByProdi']);
         Route::get('cpmk-mk-total/{kode_mk}/{kode_angkatan}', [MataKuliahController::class, 'totalBobot']);
     });
-
-    Route::get('/rumusan', [RumusanController::class, 'index'])->name('rumusan.index');
-    Route::get('/rumusan/matkul', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.matkul');
-    Route::get('/rumusan/mata_kuliah', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.mata_kuliah');
-    Route::get('/rumusan/cpl', [RumusanController::class, 'rumusanCpl'])->name('rumusan.cpl');
-    Route::get('/rumusan/cpl', [RumusanController::class, 'rumusanCpl'])->name('rumusan.cpl');
-
-    Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
-    Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
-    Route::post('/penilaian/{kode_mk}/store', [PenilaianController::class, 'store'])->name('penilaian.store');
-
-    Route::get('/hasil-obe/per-matkul', [App\Http\Controllers\HasilObeController::class, 'perMatkul'])->name('hasilobe.permatkul');
 });
