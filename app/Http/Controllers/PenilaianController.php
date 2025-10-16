@@ -12,7 +12,8 @@ class PenilaianController extends Controller
     public function index()
     {
         // Ambil semua mata kuliah dari tabel
-        $mataKuliahs = MataKuliah::all();
+        $mataKuliahs = MataKuliah::paginate(10);
+
 
         // Kirim ke view penilaian.index
         return view('penilaian.index', compact('mataKuliahs'));

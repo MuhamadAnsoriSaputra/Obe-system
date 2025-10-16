@@ -1,30 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mt-4">
-        <h3 class="fw-bold mb-4 text-primary">Penilaian Per Mata Kuliah</h3>
+    <div class="container">
+        <h2 class="fw-bold mb-4">Penilaian Per Mata Kuliah</h2>
 
-        <div class="row">
-            @forelse ($mataKuliahs as $mk)
-                <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <h5 class="fw-bold text-dark">{{ $mk->nama_mk }}</h5>
-                            <p class="mb-1"><strong>Kode:</strong> {{ $mk->kode_mk }}</p>
-                            <p class="mb-1"><strong>SKS:</strong> {{ $mk->sks }}</p>
-                            <p class="text-muted mb-3"><strong>Prodi:</strong> {{ $mk->prodi->nama_prodi ?? '-' }}</p>
+        <div class="card shadow-lg border-0">
+            <div class="card-body">
+                <table class="table table-hover text-white align-middle">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Kode MK</th>
+                            <th>Nama MK</th>
+                            <th>SKS</th>
+                            <th>Prodi</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($mataKuliahs as $index => $mk)
+                            <tr>
+                                {{-- Nomor urut berdasarkan pagination --}}
+                                <td>{{ $loop->iteration + ($mataKuliahs->firstItem() - 1) }}</td>
+                                <td>{{ $mk->kode_mk }}</td>
+                                <td>{{ $mk->nama_mk }}</td>
+                                <td>{{ $mk->sks }}</td>
+                                <td>{{ $mk->prodi->nama_prodi ?? '-' }}</td>
+                                <td>
+                                    <a href="{{ route('penilaian.input', ['kode_mk' => $mk->kode_mk]) }}"
+                                        class="btn btn-sm btn-primary">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">Belum ada data mata kuliah tersedia.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
 
-                            <a href="{{ route('penilaian.input', ['kode_mk' => $mk->kode_mk]) }}" class="btn btn-primary w-100">
-                                <i class="fas fa-pen me-2"></i>Input Nilai
-                            </a>
-                        </div>
-                    </div>
+                {{-- Pagination --}}
+                <div class="mt-3">
+                    {{ $mataKuliahs->links() }}
                 </div>
-            @empty
-                <div class="col-12 text-center">
-                    <div class="alert alert-info">Belum ada data mata kuliah tersedia.</div>
-                </div>
-            @endforelse
+            </div>
         </div>
     </div>
 @endsection
