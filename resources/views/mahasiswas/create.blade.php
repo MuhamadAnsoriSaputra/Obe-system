@@ -38,6 +38,28 @@
                         @enderror
                     </div>
 
+                    {{-- ✅ Tambahan Tahun Masuk --}}
+                    <div class="mb-3">
+                        <label for="tahun_masuk" class="form-label">Tahun Masuk</label>
+                        <input type="number" name="tahun_masuk" id="tahun_masuk"
+                            class="form-control @error('tahun_masuk') is-invalid @enderror" value="{{ old('tahun_masuk') }}"
+                            placeholder="Misal: 2022" required>
+                        @error('tahun_masuk')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    {{-- ✅ Tambahan Tahun Lulus (Opsional) --}}
+                    <div class="mb-3">
+                        <label for="tahun_lulus" class="form-label">Tahun Lulus (Opsional)</label>
+                        <input type="number" name="tahun_lulus" id="tahun_lulus"
+                            class="form-control @error('tahun_lulus') is-invalid @enderror" value="{{ old('tahun_lulus') }}"
+                            placeholder="Kosongkan jika belum lulus">
+                        @error('tahun_lulus')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     @if(auth()->user()->role === 'admin')
                         <div class="mb-3">
                             <label for="kode_prodi" class="form-label">Program Studi</label>
@@ -55,10 +77,10 @@
                     @endif
 
                     <div class="mb-3">
-                        <label for="kode_angkatan" class="form-label">Tahun Angkatan</label>
+                        <label for="kode_angkatan" class="form-label">Kurikulum</label>
                         <select name="kode_angkatan" id="kode_angkatan"
                             class="form-select @error('kode_angkatan') is-invalid @enderror" required>
-                            <option value="">-- Pilih Angkatan --</option>
+                            <option value="">-- Pilih Kurikulum --</option>
                             @foreach($angkatans as $angkatan)
                                 <option value="{{ $angkatan->kode_angkatan }}">{{ $angkatan->tahun }}</option>
                             @endforeach

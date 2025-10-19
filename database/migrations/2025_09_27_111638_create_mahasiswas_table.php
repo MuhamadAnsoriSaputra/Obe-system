@@ -13,8 +13,12 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('kode_prodi', 20);
             $table->string('kode_angkatan', 20);
+            $table->year('tahun_masuk');
+            $table->year('tahun_lulus')->nullable(); // boleh kosong karena belum tentu semua sudah lulus
+
             $table->timestamps();
 
+            // Relasi tetap dipertahankan untuk kurikulum
             $table->foreign('kode_prodi')
                 ->references('kode_prodi')
                 ->on('prodis')
@@ -27,7 +31,6 @@ return new class extends Migration {
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
         });
-
     }
 
     public function down(): void

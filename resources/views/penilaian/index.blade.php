@@ -12,23 +12,6 @@
             </div>
         @endif
 
-        {{-- Tombol Export & Import --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <a href="{{ route('penilaian.export') }}" class="btn btn-success me-2">
-                    <i class="fas fa-file-excel me-1"></i> Export Excel
-                </a>
-            </div>
-
-            <form action="{{ route('penilaian.import') }}" method="POST" enctype="multipart/form-data" class="d-flex align-items-center">
-                @csrf
-                <input type="file" name="file" class="form-control form-control-sm me-2" accept=".xlsx, .xls" required>
-                <button type="submit" class="btn btn-primary btn-sm">
-                    <i class="fas fa-upload me-1"></i> Import Excel
-                </button>
-            </form>
-        </div>
-
         {{-- Card tabel mata kuliah --}}
         <div class="card shadow-lg border-0">
             <div class="card-body">

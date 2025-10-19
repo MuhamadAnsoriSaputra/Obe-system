@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid">
-        <h2 class="fw-bold mb-4">Dashboard</h2>
+    <div class="dashboard-container container-fluid">
+        <h2 class="fw-bold mb-4 text-white">Dashboard Admin</h2>
 
         {{-- Cards Statistik --}}
         <div class="row g-4 mb-4">
@@ -37,6 +37,7 @@
         </div>
 
         {{-- Menu Cepat --}}
+        <h5 class="fw-bold mb-3 text-white">Menu Cepat</h5>
         <div class="row g-4">
             <div class="col-md-3">
                 <a href="{{ url('/users') }}" class="menu-card">

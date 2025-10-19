@@ -58,6 +58,8 @@ class MahasiswaController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:mahasiswas,email',
             'kode_angkatan' => 'required|exists:angkatans,kode_angkatan',
+            'tahun_masuk' => 'required|digits:4|integer|min:2000|max:' . date('Y'),
+            'tahun_lulus' => 'nullable|digits:4|integer|min:2000|max:' . (date('Y') + 6),
         ]);
 
         Mahasiswa::create([
@@ -68,6 +70,8 @@ class MahasiswaController extends Controller
                 ? $user->kode_prodi
                 : $request->kode_prodi,
             'kode_angkatan' => $request->kode_angkatan,
+            'tahun_masuk' => $request->tahun_masuk,
+            'tahun_lulus' => $request->tahun_lulus,
         ]);
 
         return redirect()->route('mahasiswas.index')->with('success', 'Mahasiswa berhasil ditambahkan');
@@ -100,17 +104,24 @@ class MahasiswaController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:mahasiswas,email,' . $nim . ',nim',
             'kode_angkatan' => 'required|exists:angkatans,kode_angkatan',
+            'tahun_masuk' => 'required|digits:4|integer|min:2000|max:' . date('Y'),
+            'tahun_lulus' => 'nullable|digits:4|integer|min:2000|max:' . (date('Y') + 6),
         ]);
 
-        if ($user->role === 'akademik' && $mahasiswa->kode_prodi !== $user->kode_prodi) {
-            abort(403, 'Anda tidak memiliki izin untuk memperbarui mahasiswa prodi lain.');
-        }
-
-        $mahasiswa->update([
+        $data = [
             'nama' => $request->nama,
             'email' => $request->email,
             'kode_angkatan' => $request->kode_angkatan,
-        ]);
+            'tahun_masuk' => $request->tahun_masuk,
+            'tahun_lulus' => $request->tahun_lulus,
+        ];
+
+        // Hanya admin yang bisa ubah prodi
+        if ($user->role === 'admin') {
+            $data['kode_prodi'] = $request->kode_prodi;
+        }
+
+        $mahasiswa->update($data);
 
         return redirect()->route('mahasiswas.index')->with('success', 'Mahasiswa berhasil diperbarui');
     }

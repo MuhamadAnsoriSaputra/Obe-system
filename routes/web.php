@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
-// Controllers
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\AngkatanController;
@@ -16,115 +16,168 @@ use App\Http\Controllers\RumusanController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\HasilObeController;
 
-// Models
-use App\Models\User;
-use App\Models\Dosen;
-use App\Models\Mahasiswa;
-use App\Models\MataKuliah;
-use App\Models\Prodi;
-
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| LOGIN & GOOGLE AUTH
 |--------------------------------------------------------------------------
 */
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Default redirect ke dashboard
+Route::get('/auth/google', [LoginController::class, 'redirectToGoogle'])->name('google.redirect');
+Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback'])->name('google.callback');
+
+/*
+|--------------------------------------------------------------------------
+| DEFAULT REDIRECT
+|--------------------------------------------------------------------------
+*/
 Route::get('/', fn() => redirect()->route('dashboard'));
 
 /*
 |--------------------------------------------------------------------------
-| Protected Routes (auth)
+| PROTECTED ROUTES
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
 
-    // =======================
-    // DASHBOARD
-    // =======================
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD REDIRECT PER ROLE
+    |--------------------------------------------------------------------------
+    */
     Route::get('/dashboard', function () {
-        $stats = [
-            'users' => User::count(),
-            'dosens' => Dosen::count(),
-            'mahasiswas' => Mahasiswa::count(),
-            'prodis' => Prodi::count(),
-            'mata_kuliahs' => MataKuliah::count(),
-        ];
-        return view('dashboard', compact('stats'));
+        $role = Auth::user()->role;
+
+        return match ($role) {
+            'admin' => redirect()->route('dashboard.admin'),
+            'akademik' => redirect()->route('dashboard.akademik'),
+            'dosen' => redirect()->route('dashboard.dosen'),
+            'kaprodi' => redirect()->route('dashboard.kaprodi'),
+            'wadir1' => redirect()->route('dashboard.wadir1'),
+            default => abort(403, 'Role tidak dikenali'),
+        };
     })->name('dashboard');
 
-    // =======================
-    // CRUD RESOURCE
-    // =======================
-    Route::resources([
-        'users' => UserController::class,
-        'prodis' => ProdiController::class,
-        'angkatans' => AngkatanController::class,
-        'mahasiswas' => MahasiswaController::class,
-        'cpls' => CplController::class,
-        'cpmks' => CpmkController::class,
-        'mata_kuliahs' => MataKuliahController::class,
-        'dosens' => DosenController::class,
-    ]);
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN (SEMUA AKSES)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('users', UserController::class);
+        Route::resource('prodis', ProdiController::class);
+        Route::resource('angkatans', AngkatanController::class);
+        Route::resource('mahasiswas', MahasiswaController::class);
+        Route::resource('cpls', CplController::class);
+        Route::resource('cpmks', CpmkController::class);
+        Route::prefix('rumusan')->middleware(['role:admin,kaprodi,akademik'])->group(function () {
+            Route::get('/', [RumusanController::class, 'index'])->name('rumusan.index');
+            Route::get('/mata_kuliah', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.mata_kuliah');
+            Route::get('/cpl', [RumusanController::class, 'rumusanCpl'])->name('rumusan.cpl');
+        });
+        Route::resource('mata_kuliahs', MataKuliahController::class);
+        Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
+        Route::resource('dosens', DosenController::class);
+        Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
 
-    // Detail mahasiswa
-    Route::get('/mahasiswas/{nim}/detail', [MahasiswaController::class, 'show'])
-        ->name('mahasiswas.show');
+        // Halaman input nilai per mata kuliah
+        Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
 
-    // =======================
-    // MATA KULIAH DETAIL
-    // =======================
-    Route::prefix('mata_kuliahs')->group(function () {
-        Route::get('{kode_mk}', [MataKuliahController::class, 'show'])->name('mata_kuliahs.show');
-        Route::post('{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
-        Route::post('{kode_mk}/detail', [MataKuliahController::class, 'storeDetail'])->name('mata_kuliahs.storeDetail');
-        Route::delete('remove-cpmk/{id}', [MataKuliahController::class, 'removeCpmk'])->name('mata_kuliahs.removeCpmk');
-        Route::put('{kode_mk}/update-cpmk', [MataKuliahController::class, 'updateCpmk'])->name('mata_kuliahs.updateCpmk');
+        // Simpan nilai
+        Route::post('/penilaian/{kode_mk}/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
     });
 
-    // =======================
-    // PENILAIAN (OBE)
-    // =======================
-    Route::prefix('penilaian')->group(function () {
-        // 📋 Halaman daftar mata kuliah
-        Route::get('/', [PenilaianController::class, 'index'])->name('penilaian.index');
-
-        // 📝 Input penilaian per mata kuliah
-        Route::get('/input/{kode_mk}', [PenilaianController::class, 'input'])->name('penilaian.input');
-
-        // 💾 Simpan hasil penilaian
-        Route::post('/store/{kode_mk}', [PenilaianController::class, 'store'])->name('penilaian.store');
-
-        // 📤 Export dan 📥 Import Excel
-        Route::get('/export', [PenilaianController::class, 'export'])->name('penilaian.export');
-        Route::post('/import', [PenilaianController::class, 'import'])->name('penilaian.import');
+    /*
+    |--------------------------------------------------------------------------
+    | AKADEMIK
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin,akademik'])->group(function () {
+        Route::resource('angkatans', AngkatanController::class);
+        Route::resource('mahasiswas', MahasiswaController::class);
+        Route::resource('cpls', CplController::class);
+        Route::resource('cpmks', CpmkController::class);
+        Route::resource('rumusan', RumusanController::class);
+        Route::get('/rumusan/mata_kuliah', [RumusanController::class, 'mata_kuliah'])->name('rumusan.mata_kuliah');
+        Route::get('/rumusan/cpl', [RumusanController::class, 'cpl'])->name('rumusan.cpl');
+        Route::resource('mata_kuliahs', MataKuliahController::class);
+        Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
+        Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])
+            ->name('mata_kuliahs.simpanBobot');
+        Route::delete('/mata_kuliahs/{kode_mk}/remove-cpmk/{kode_cpmk}', [MataKuliahController::class, 'removeCpmk'])
+            ->name('mata_kuliahs.removeCpmk');
+        Route::resource('dosens', DosenController::class);
     });
 
-    // =======================
-    // RUMUSAN OBE
-    // =======================
-    Route::prefix('rumusan')->group(function () {
-        Route::get('/', [RumusanController::class, 'index'])->name('rumusan.index');
-        Route::get('/matkul', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.matkul');
-        Route::get('/mata_kuliah', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.mata_kuliah');
-        Route::get('/cpl', [RumusanController::class, 'rumusanCpl'])->name('rumusan.cpl');
+    /*
+    |--------------------------------------------------------------------------
+    | DOSEN
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin,dosen'])->group(function () {
+        Route::resource('mata_kuliahs', MataKuliahController::class);
+        Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
+        Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])
+            ->name('mata_kuliahs.simpanBobot');
+        Route::delete('/mata_kuliahs/{kode_mk}/remove-cpmk/{kode_cpmk}', [MataKuliahController::class, 'removeCpmk'])
+            ->name('mata_kuliahs.removeCpmk');
+        Route::resource('penilaian', PenilaianController::class);
+        Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
+
+        // Halaman input nilai per mata kuliah
+        Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
+
+        // Simpan nilai
+        Route::post('/penilaian/{kode_mk}/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
     });
 
-    // =======================
-    // HASIL OBE
-    // =======================
-    Route::get('/hasil-obe/per-matkul', [HasilObeController::class, 'perMatkul'])->name('hasilobe.permatkul');
+    /*
+    |--------------------------------------------------------------------------
+    | KAPRODI
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin,kaprodi'])->group(function () {
+        Route::resource('rumusan', RumusanController::class);
+        Route::get('/rumusan/mata_kuliah', [RumusanController::class, 'mata_kuliah'])->name('rumusan.mata_kuliah');
+        Route::get('/rumusan/cpl', [RumusanController::class, 'cpl'])->name('rumusan.cpl');
+        Route::resource('mahasiswas', MahasiswaController::class);
+    });
 
-    // =======================
-    // ROUTE API / AJAX
-    // =======================
+    /*
+    |--------------------------------------------------------------------------
+    | WADIR 1
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:admin,wadir1'])->group(function () {
+        Route::resource('mahasiswas', MahasiswaController::class);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | API ROUTES (AJAX)
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('api')->group(function () {
         Route::get('cpl/by-angkatan/{kode_angkatan}/{kode_prodi}', [CpmkController::class, 'getCplByAngkatan']);
         Route::get('cpmks/{kode_cpl}/{kode_mk}', [MataKuliahController::class, 'getCpmkByCpl']);
         Route::get('angkatan/by-prodi/{kode_prodi}', [AngkatanController::class, 'getByProdi']);
         Route::get('cpmk-mk-total/{kode_mk}/{kode_angkatan}', [MataKuliahController::class, 'totalBobot']);
+        Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])
+            ->name('mata_kuliahs.simpanBobot');
+        Route::delete('/mata_kuliahs/{kode_mk}/remove-cpmk/{kode_cpmk}', [MataKuliahController::class, 'removeCpmk'])
+            ->name('mata_kuliahs.removeCpmk');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD PER ROLE (VIEW STATIS)
+    |--------------------------------------------------------------------------
+    */
+    Route::view('/dashboard/admin', 'dashboard.admin')->name('dashboard.admin');
+    Route::view('/dashboard/akademik', 'dashboard.akademik')->name('dashboard.akademik');
+    Route::view('/dashboard/dosen', 'dashboard.dosen')->name('dashboard.dosen');
+    Route::view('/dashboard/kaprodi', 'dashboard.kaprodi')->name('dashboard.kaprodi');
+    Route::view('/dashboard/wadir1', 'dashboard.wadir1')->name('dashboard.wadir1');
 });

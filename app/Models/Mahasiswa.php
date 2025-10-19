@@ -20,6 +20,8 @@ class Mahasiswa extends Model
         'email',
         'kode_prodi',
         'kode_angkatan',
+        'tahun_masuk',
+        'tahun_lulus',
     ];
 
     public function prodi()

@@ -144,11 +144,15 @@
                                 <td>{{ $item->kode_cpmk }}</td>
                                 <td>{{ $item->bobot }}</td>
                                 <td>
-                                    <form action="{{ route('mata_kuliahs.removeCpmk', $item->id) }}" method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus bobot ini?')">
+                                    <form
+                                        action="{{ route('mata_kuliahs.removeCpmk', ['kode_mk' => $mataKuliah->kode_mk, 'kode_cpmk' => $cpmk->kode_cpmk]) }}"
+                                        method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                            onclick="return confirm('Yakin ingin menghapus CPMK ini dari mata kuliah?')">
+                                            Hapus
+                                        </button>
                                     </form>
                                 </td>
                             </tr>

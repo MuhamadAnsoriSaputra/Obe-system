@@ -6,9 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\MataKuliah;
 use App\Models\Penilaian;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\PenilaianExport;
-use App\Imports\PenilaianImport;
 
 class PenilaianController extends Controller
 {
@@ -23,45 +20,61 @@ class PenilaianController extends Controller
         $matakuliah = MataKuliah::where('kode_mk', $kode_mk)->firstOrFail();
         $kode_angkatan = DB::table('mahasiswas')->value('kode_angkatan');
 
-        $cpl = DB::table('cpls')
-            ->join('cpl_mata_kuliah', 'cpls.kode_cpl', '=', 'cpl_mata_kuliah.kode_cpl')
-            ->select('cpls.kode_cpl', 'cpls.deskripsi', 'cpl_mata_kuliah.kode_angkatan')
-            ->where('cpl_mata_kuliah.kode_mk', $kode_mk)
-            ->where('cpl_mata_kuliah.kode_angkatan', $kode_angkatan)
-            ->get();
-
-        $cpmk = DB::table('cpmks')
-            ->join('cpmk_mata_kuliah', 'cpmks.kode_cpmk', '=', 'cpmk_mata_kuliah.kode_cpmk')
+        // Ambil daftar nilai mahasiswa yang sudah diinput untuk MK ini
+        $daftarNilai = DB::table('penilaians')
+            ->join('mahasiswas', 'penilaians.nim', '=', 'mahasiswas.nim')
             ->select(
-                'cpmks.kode_cpmk',
-                'cpmks.kode_cpl',
-                'cpmks.deskripsi_cpmk',
-                'cpmk_mata_kuliah.bobot as skor_maks',
-                'cpmk_mata_kuliah.kode_angkatan'
+                'penilaians.nim',
+                'mahasiswas.nama',
+                DB::raw('SUM(penilaians.nilai_perkuliahan) as nilai_akhir')
             )
-            ->where('cpmk_mata_kuliah.kode_mk', $kode_mk)
-            ->where('cpmk_mata_kuliah.kode_angkatan', $kode_angkatan)
+            ->where('penilaians.kode_mk', $kode_mk)
+            ->groupBy('penilaians.nim', 'mahasiswas.nama')
             ->get();
 
-        return view('penilaian.input', compact('matakuliah', 'cpl', 'cpmk', 'kode_angkatan'));
+        return view('penilaian.input', compact('matakuliah', 'daftarNilai', 'kode_angkatan'));
     }
 
     public function store(Request $request, $kode_mk)
     {
-        foreach ($request->kode_cpmk as $i => $kode_cpmk) {
+        $request->validate([
+            'nim' => 'required|string',
+            'nama' => 'required|string',
+            'nilai_akhir' => 'required|numeric|min:0|max:100',
+        ]);
+
+        $nim = $request->nim;
+        $nilaiAkhir = $request->nilai_akhir;
+
+        // Ambil angkatan mahasiswa
+        $kode_angkatan = DB::table('mahasiswas')
+            ->where('nim', $nim)
+            ->value('kode_angkatan');
+
+        // Ambil semua CPMK dengan bobot untuk MK & angkatan ini
+        $cpmkList = DB::table('cpmk_mata_kuliah')
+            ->join('cpmks', 'cpmk_mata_kuliah.kode_cpmk', '=', 'cpmks.kode_cpmk')
+            ->select('cpmk_mata_kuliah.*', 'cpmks.kode_cpl')
+            ->where('kode_mk', $kode_mk)
+            ->where('kode_angkatan', $kode_angkatan)
+            ->get();
+
+        foreach ($cpmkList as $item) {
+            // Hitung nilai berdasarkan bobot
+            $nilaiPerkuliahan = ($nilaiAkhir * $item->bobot) / 100;
+
             Penilaian::create([
-                'nim' => $request->nim,
+                'nim' => $nim,
                 'kode_mk' => $kode_mk,
-                'kode_cpl' => $request->kode_cpl[$i],
-                'kode_cpmk' => $kode_cpmk,
-                'kode_angkatan' => $request->kode_angkatan,
-                'skor_maks' => $request->skor_maks[$i],
-                'nilai_perkuliahan' => $request->nilai_perkuliahan[$i],
+                'kode_cpl' => $item->kode_cpl,
+                'kode_cpmk' => $item->kode_cpmk,
+                'kode_angkatan' => $kode_angkatan,
+                'skor_maks' => $item->bobot, // bobot tetap disimpan
+                'nilai_perkuliahan' => $nilaiPerkuliahan, // hasil akhir * bobot / 100
             ]);
         }
 
-        // Hitung capaian CPL
-        $nim = $request->nim;
+        // === Hitung capaian CPL otomatis ===
         $cplData = DB::table('penilaians')
             ->select(
                 'kode_cpl',
@@ -81,28 +94,6 @@ class PenilaianController extends Controller
             );
         }
 
-        return redirect()->back()->with('success', 'Data nilai dan capaian CPL berhasil disimpan!');
-    }
-
-    // =====================================================
-    // 📤 EXPORT EXCEL
-    // =====================================================
-    public function export()
-    {
-        return Excel::download(new PenilaianExport, 'penilaian.xlsx');
-    }
-
-    // =====================================================
-    // 📥 IMPORT EXCEL
-    // =====================================================
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls'
-        ]);
-
-        Excel::import(new PenilaianImport, $request->file('file'));
-
-        return back()->with('success', 'Data penilaian berhasil diimpor!');
+        return redirect()->back()->with('success', 'Nilai akhir berhasil dihitung dan disimpan!');
     }
 }

@@ -2,72 +2,64 @@
 
 @section('content')
     <div class="container">
-        <h3>Input Nilai - {{ $matakuliah->nama_mk }}</h3>
+        <h3 class="mb-4">Input Nilai Akhir - {{ $matakuliah->nama_mk }}</h3>
 
+        {{-- Notifikasi sukses --}}
         @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success mt-3">{{ session('success') }}</div>
         @endif
 
-        <form action="{{ route('penilaian.store', $matakuliah->kode_mk) }}" method="POST">
+        {{-- Form Input Nilai --}}
+        <form action="{{ route('penilaian.store', $matakuliah->kode_mk) }}" method="POST" class="mb-4">
             @csrf
 
-            <div class="mb-3">
-                <label for="nim" class="form-label">NIM Mahasiswa</label>
-                <input type="text" name="nim" class="form-control" required>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="nim" class="form-label fw-bold">NIM Mahasiswa</label>
+                    <input type="text" name="nim" class="form-control" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="nama" class="form-label fw-bold">Nama Mahasiswa</label>
+                    <input type="text" name="nama" class="form-control" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="nilai_akhir" class="form-label fw-bold">Nilai Akhir</label>
+                    <input type="number" name="nilai_akhir" class="form-control" step="0.01" min="0" max="100" required>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label for="kode_angkatan" class="form-label">Kode Angkatan</label>
-                <input type="text" name="kode_angkatan" class="form-control" value="{{ $kode_angkatan }}" readonly>
-            </div>
-
-            <table class="table table-bordered text-center align-middle">
-                <thead class="table-warning">
-                    <tr>
-                        <th>MK</th>
-                        <th>CPL</th>
-                        <th>CPMK</th>
-                        <th>Skor Maks (Bobot)</th>
-                        <th>Nilai Perkuliahan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($cpl as $itemCpl)
-                        @php
-                            $relatedCpmk = $cpmk->where('kode_cpl', $itemCpl->kode_cpl);
-                        @endphp
-
-                        @foreach($relatedCpmk as $itemCpmk)
-                            <tr>
-                                <td>{{ $matakuliah->kode_mk }}</td>
-
-                                <td>
-                                    <input type="hidden" name="kode_cpl[]" value="{{ $itemCpl->kode_cpl }}">
-                                    {{ $itemCpl->kode_cpl }}
-                                </td>
-
-                                <td>
-                                    <input type="hidden" name="kode_cpmk[]" value="{{ $itemCpmk->kode_cpmk }}">
-                                    {{ $itemCpmk->kode_cpmk }}
-                                </td>
-
-                                {{-- Skor Maks diambil dari bobot CPMK-MK --}}
-                                <td>
-                                    <input type="number" name="skor_maks[]" class="form-control text-center" step="0.01"
-                                        value="{{ $itemCpmk->skor_maks }}" readonly>
-                                </td>
-
-                                <td>
-                                    <input type="number" name="nilai_perkuliahan[]" class="form-control text-center" step="0.01"
-                                        required>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @endforeach
-                </tbody>
-            </table>
-
-            <button type="submit" class="btn btn-primary mt-3">Simpan Nilai</button>
+            <button type="submit" class="btn btn-primary">Simpan Nilai</button>
         </form>
+
+        {{-- Tabel Daftar Mahasiswa yang Sudah Dinilai --}}
+        <h5 class="mt-4">Daftar Mahasiswa yang Sudah Dinilai</h5>
+
+        <table class="table table-bordered text-center align-middle mt-2">
+            <thead class="table-warning">
+                <tr>
+                    <th>No</th>
+                    <th>NIM</th>
+                    <th>Nama Mahasiswa</th>
+                    <th>Nilai Akhir</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php $no = 1; @endphp
+                @forelse($daftarNilai as $item)
+                    <tr>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $item->nim }}</td>
+                        <td>{{ $item->nama ?? '-' }}</td>
+                        <td>{{ number_format($item->nilai_akhir, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="text-muted">Belum ada mahasiswa yang dinilai</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 @endsection

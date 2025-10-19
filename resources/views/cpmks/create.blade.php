@@ -35,7 +35,7 @@
                             <option value="">-- Pilih CPL --</option>
                             @foreach($cpls as $cpl)
                                 <option value="{{ $cpl->kode_cpl }}" {{ old('kode_cpl') == $cpl->kode_cpl ? 'selected' : '' }}>
-                                    {{ $cpl->kode_cpl }} - {{ $cpl->deskripsi_cpl }}
+                                    {{ $cpl->kode_cpl }}
                                 </option>
                             @endforeach
                         </select>

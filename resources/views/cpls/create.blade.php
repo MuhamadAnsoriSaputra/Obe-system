@@ -37,10 +37,10 @@
                     @endif
 
                     <div class="mb-3">
-                        <label for="kode_angkatan" class="form-label">Tahun Angkatan</label>
+                        <label for="kode_angkatan" class="form-label">Kurikulum</label>
                         <select name="kode_angkatan" id="kode_angkatan"
                             class="form-select @error('kode_angkatan') is-invalid @enderror" required>
-                            <option value="">-- Pilih Angkatan --</option>
+                            <option value="">-- Pilih Kurikulum --</option>
                             @foreach($angkatans as $angkatan)
                                 <option value="{{ $angkatan->kode_angkatan }}">{{ $angkatan->tahun }}</option>
                             @endforeach
