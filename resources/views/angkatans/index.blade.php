@@ -51,18 +51,18 @@
                             <td>{{ $angkatan->kode_angkatan }}</td>
                             <td>{{ $angkatan->tahun }}</td>
                             <td>{{ $angkatan->prodi->nama_prodi ?? '-' }}</td>
-                            <td>
-                                <a href="{{ route('angkatans.edit', $angkatan->kode_angkatan) }}"
-                                    class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('angkatans.destroy', $angkatan->kode_angkatan) }}" method="POST"
-                                    class="d-inline" onsubmit="return confirm('Yakin hapus angkatan ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                                </form>
-                            </td>
+                                <td>
+                                    <a href="{{ route('angkatans.edit', $angkatan->kode_angkatan) }}"
+                                        class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('angkatans.destroy', $angkatan->kode_angkatan) }}" method="POST"
+                                        class="d-inline" onsubmit="return confirm('Yakin hapus angkatan ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </td>
                         </tr>
                     @empty
                         <tr>

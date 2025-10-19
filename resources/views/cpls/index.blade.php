@@ -18,9 +18,11 @@
 
         {{-- Tombol Tambah + Search --}}
         <div class="top-actions">
-            <a href="{{ route('cpls.create') }}" class="btn-tambah">
-                <i class="fas fa-plus me-2"></i> Tambah CPL
-            </a>
+            @if(auth()->user()->role === 'akademik') {{-- Hanya tampil untuk akademik --}}
+                <a href="{{ route('cpls.create') }}" class="btn-tambah">
+                    <i class="fas fa-plus me-2"></i> Tambah CPL
+                </a>
+            @endif
 
             <form action="{{ route('cpls.index') }}" method="GET" role="search" class="search-form">
                 <div class="search-box">
@@ -46,7 +48,9 @@
                         <th>Kode CPL</th>
                         <th>Deskripsi</th>
                         <th>Kurikulum</th>
-                        <th class="text-center">Aksi</th>
+                        @if(auth()->user()->role === 'akademik') {{-- Kolom aksi hanya untuk akademik --}}
+                            <th class="text-center">Aksi</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -56,23 +60,27 @@
                             <td>{{ $cpl->kode_cpl }}</td>
                             <td>{{ $cpl->deskripsi }}</td>
                             <td>{{ $cpl->angkatan->tahun ?? '-' }}</td>
-                            <td>
-                                <a href="{{ route('cpls.edit', $cpl->kode_cpl) }}" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('cpls.destroy', $cpl->kode_cpl) }}" method="POST" class="d-inline"
-                                    onsubmit="return confirm('Yakin hapus CPL ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
+
+                            @if(auth()->user()->role === 'akademik') {{-- Tombol edit/hapus hanya untuk akademik --}}
+                                <td>
+                                    <a href="{{ route('cpls.edit', $cpl->kode_cpl) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('cpls.destroy', $cpl->kode_cpl) }}" method="POST" class="d-inline"
+                                        onsubmit="return confirm('Yakin hapus CPL ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center">Belum ada CPL</td>
+                            <td colspan="{{ auth()->user()->role === 'akademik' ? 5 : 4 }}" class="text-center">Belum ada CPL
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

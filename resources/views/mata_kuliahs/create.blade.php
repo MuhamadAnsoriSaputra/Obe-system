@@ -1,11 +1,14 @@
+@push('styles')
+    <link href="{{ asset('css/create.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('content')
     <div class="container">
-        <h2 class="fw-bold mb-4 text-white">Tambah Mata Kuliah</h2>
+    <h2 class="fw-bold mb-4">Tambah Matakuliah</h2>
 
-        <div class="card shadow-lg border-0"
-            style="border-radius: 15px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); color:#fff;">
+        <div class="card shadow-lg border-0 custom-form">
             <div class="card-body p-4">
                 <form action="{{ route('mata_kuliahs.store') }}" method="POST">
                     @csrf
@@ -76,13 +79,12 @@
                     {{-- Dosen Pengampu --}}
                     <div class="mb-3">
                         <label class="form-label">Dosen Pengampu</label>
-                        <div class="border rounded p-3 bg-transparent"
-                            style="max-height:300px; overflow-y:auto; backdrop-filter: blur(6px); background: rgba(255,255,255,0.1);">
+                        <div class="border rounded p-3 custom-checkbox-wrapper">
                             @foreach ($dosens as $dosen)
                                 <div class="form-check mb-2">
                                     <input class="form-check-input" type="checkbox" name="dosens[]"
                                         value="{{ $dosen->nip }}" id="dosen{{ $loop->index }}">
-                                    <label class="form-check-label text-white"
+                                    <label class="form-check-label text-dark"
                                         for="dosen{{ $loop->index }}">{{ $dosen->nama }}</label>
                                 </div>
                             @endforeach

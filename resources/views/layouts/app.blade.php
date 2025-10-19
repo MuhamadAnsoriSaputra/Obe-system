@@ -98,11 +98,6 @@
             {{-- ===================================== --}}
             @if (Auth::user()->role === 'akademik')
                 <li class="nav-item">
-                    <a href="{{ url('/angkatans') }}" class="nav-link {{ request()->is('angkatans*') ? 'active' : '' }}">
-                        <i class="fas fa-calendar-alt"></i> Kurikulum
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="{{ url('/mahasiswas') }}" class="nav-link {{ request()->is('mahasiswas*') ? 'active' : '' }}">
                         <i class="fas fa-user-graduate"></i> Mahasiswa
                     </a>

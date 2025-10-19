@@ -97,7 +97,6 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:admin,akademik'])->group(function () {
-        Route::resource('angkatans', AngkatanController::class);
         Route::resource('mahasiswas', MahasiswaController::class);
         Route::resource('cpls', CplController::class);
         Route::resource('cpmks', CpmkController::class);
@@ -115,7 +114,7 @@ Route::middleware(['auth'])->group(function () {
     | DOSEN
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:admin,dosen'])->group(function () {
+    Route::middleware(['role:admin,dosen,akademik'])->group(function () {
         Route::resource('mata_kuliahs', MataKuliahController::class);
         Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
         Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])
@@ -137,7 +136,7 @@ Route::middleware(['auth'])->group(function () {
     | KAPRODI
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:admin,kaprodi'])->group(function () {
+    Route::middleware(['role:admin,akademik,kaprodi'])->group(function () {
         Route::resource('mahasiswas', MahasiswaController::class);
     });
 
@@ -146,7 +145,7 @@ Route::middleware(['auth'])->group(function () {
     | WADIR 1
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:admin,wadir1'])->group(function () {
+    Route::middleware(['role:admin,wadir1,akademik,kaprodi'])->group(function () {
         Route::resource('mahasiswas', MahasiswaController::class);
     });
 

@@ -1,3 +1,7 @@
+@push('styles')
+    <link href="{{ asset('css/create.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('content')
@@ -38,7 +42,6 @@
                         @enderror
                     </div>
 
-                    {{-- ✅ Tambahan Tahun Masuk --}}
                     <div class="mb-3">
                         <label for="tahun_masuk" class="form-label">Tahun Masuk</label>
                         <input type="number" name="tahun_masuk" id="tahun_masuk"
@@ -49,7 +52,6 @@
                         @enderror
                     </div>
 
-                    {{-- ✅ Tambahan Tahun Lulus (Opsional) --}}
                     <div class="mb-3">
                         <label for="tahun_lulus" class="form-label">Tahun Lulus (Opsional)</label>
                         <input type="number" name="tahun_lulus" id="tahun_lulus"
@@ -67,7 +69,9 @@
                                 class="form-select @error('kode_prodi') is-invalid @enderror" required>
                                 <option value="">-- Pilih Prodi --</option>
                                 @foreach($prodis as $prodi)
-                                    <option value="{{ $prodi->kode_prodi }}">{{ $prodi->nama_prodi }}</option>
+                                    <option value="{{ $prodi->kode_prodi }}" {{ old('kode_prodi') == $prodi->kode_prodi ? 'selected' : '' }}>
+                                        {{ $prodi->nama_prodi }} ({{ $prodi->jenjang }})
+                                    </option>
                                 @endforeach
                             </select>
                             @error('kode_prodi')
@@ -82,7 +86,9 @@
                             class="form-select @error('kode_angkatan') is-invalid @enderror" required>
                             <option value="">-- Pilih Kurikulum --</option>
                             @foreach($angkatans as $angkatan)
-                                <option value="{{ $angkatan->kode_angkatan }}">{{ $angkatan->tahun }}</option>
+                                <option value="{{ $angkatan->kode_angkatan }}" {{ old('kode_angkatan') == $angkatan->kode_angkatan ? 'selected' : '' }}>
+                                    {{ $angkatan->tahun }}
+                                </option>
                             @endforeach
                         </select>
                         @error('kode_angkatan')

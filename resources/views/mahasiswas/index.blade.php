@@ -16,9 +16,11 @@
         @endif
 
         <div class="top-actions">
-            <a href="{{ route('mahasiswas.create') }}" class="btn-tambah">
-                <i class="fas fa-plus me-2"></i> Tambah Mahasiswa
-            </a>
+            @if(auth()->user()->role === 'akademik')
+                <a href="{{ route('mahasiswas.create') }}" class="btn-tambah">
+                    <i class="fas fa-plus me-2"></i> Tambah Mahasiswa
+                </a>
+            @endif
 
             <form action="{{ route('mahasiswas.index') }}" method="GET" role="search" class="search-form">
                 <div class="search-box">
@@ -51,20 +53,25 @@
                             <td>{{ $mhs->angkatan->tahun ?? '-' }}</td>
                             <td class="text-nowrap text-center">
                                 <div class="d-flex justify-content-center gap-1">
+                                    {{-- Semua role bisa lihat --}}
                                     <a href="{{ route('mahasiswas.show', $mhs->nim) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('mahasiswas.edit', $mhs->nim) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('mahasiswas.destroy', $mhs->nim) }}" method="POST"
-                                        class="d-inline-flex" onsubmit="return confirm('Yakin hapus mahasiswa ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+
+                                    {{-- Hanya akademik yang bisa edit & hapus --}}
+                                    @if(auth()->user()->role === 'akademik')
+                                        <a href="{{ route('mahasiswas.edit', $mhs->nim) }}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('mahasiswas.destroy', $mhs->nim) }}" method="POST"
+                                            class="d-inline-flex" onsubmit="return confirm('Yakin hapus mahasiswa ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

@@ -1,3 +1,7 @@
+@push('styles')
+    <link href="{{ asset('css/index.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('content')
@@ -11,55 +15,51 @@
             </div>
         @endif
 
-        <div class="mb-3 d-flex justify-content-between align-items-center">
-            <a href="{{ route('cpmks.create') }}" class="btn btn-light fw-bold">
-                <i class="fas fa-plus me-2"></i> Tambah CPMK
-            </a>
+        {{-- Top Actions --}}
+        <div class="top-actions">
+            @if(auth()->user()->role === 'akademik')
+                <a href="{{ route('cpmks.create') }}" class="btn-tambah">
+                    <i class="fas fa-plus me-2"></i> Tambah CPMK
+                </a>
+            @endif
 
-            <form action="{{ route('cpmks.index') }}" method="GET" class="d-flex align-items-center" role="search">
-                <div class="d-flex align-items-center"
-                    style="background: #ffffff; padding:2px 10px; border-radius: 25px; max-width:250px; height:32px;">
-                    <i class="fas fa-search me-2 text-dark" style="font-size: 13px;"></i>
-                    <input type="text" name="search" class="form-control border-0 bg-transparent text-dark"
-                        placeholder="Cari data..." style="box-shadow:none; height:28px; padding:0; font-size: 14px;"
-                        value="{{ request('search') }}">
+            <form action="{{ route('cpmks.index') }}" method="GET" role="search" class="search-form">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="search" placeholder="Cari data..." value="{{ request('search') }}">
                 </div>
-                <button type="submit"
-                    class="btn ms-2 px-4 rounded-pill fw-semibold d-flex align-items-center justify-content-center"
-                    style="height:32px; line-height: 1; border:1px solid rgba(255,255,255,0.6); background:transparent; color:white; transition:0.3s;">
-                    Cari
-                </button>
+                <button type="submit" class="btn-cari">Cari</button>
 
-                <style>
-                    button[type="submit"]:hover {
-                        background: rgba(255, 255, 255, 0.2);
-                        border-color: white;
-                    }
-                </style>
-
+                @if(request('search'))
+                    <a href="{{ route('cpmks.index') }}" class="btn-cari ms-2" style="background:#ccc; color:#000;">
+                        Reset
+                    </a>
+                @endif
             </form>
-
         </div>
 
-        <div class="card shadow-lg border-0">
-            <div class="card-body">
-                <table class="table table-hover text-white align-middle">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Kode CPL</th>
-                            <th>Kode CPMK</th>
-                            <th>Deskripsi</th>
+        <div class="table-wrapper">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode CPL</th>
+                        <th>Kode CPMK</th>
+                        <th>Deskripsi</th>
+                        @if(auth()->user()->role === 'akademik')
                             <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($cpmks as $index => $cpmk)
-                            <tr>
-                                <td>{{ $loop->iteration + ($cpmks->firstItem() - 1) }}</td>
-                                <td>{{ $cpmk->kode_cpl }}</td>
-                                <td>{{ $cpmk->kode_cpmk }}</td>
-                                <td>{{ $cpmk->deskripsi_cpmk }}</td>
+                        @endif
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($cpmks as $cpmk)
+                        <tr>
+                            <td>{{ $loop->iteration + ($cpmks->firstItem() - 1) }}</td>
+                            <td>{{ $cpmk->kode_cpl }}</td>
+                            <td>{{ $cpmk->kode_cpmk }}</td>
+                            <td>{{ $cpmk->deskripsi_cpmk }}</td>
+
+                            @if(auth()->user()->role === 'akademik')
                                 <td>
                                     <a href="{{ route('cpmks.edit', $cpmk->kode_cpmk) }}" class="btn btn-sm btn-warning">
                                         <i class="fas fa-edit"></i>
@@ -68,19 +68,24 @@
                                         onsubmit="return confirm('Yakin hapus CPMK ini?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                        <button class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </form>
                                 </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center">Belum ada CPMK</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                            @endif
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="{{ auth()->user()->role === 'akademik' ? 5 : 4 }}" class="text-center">Belum ada CPMK
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
 
-                {{-- Pagination tetap membawa parameter search --}}
+            {{-- Pagination --}}
+            <div class="mt-3">
                 {{ $cpmks->appends(['search' => request('search')])->links() }}
             </div>
         </div>

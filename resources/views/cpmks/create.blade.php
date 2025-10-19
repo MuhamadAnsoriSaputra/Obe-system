@@ -1,11 +1,14 @@
+@push('styles')
+    <link href="{{ asset('css/create.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('content')
     <div class="container">
         <h2 class="fw-bold mb-4">Tambah CPMK</h2>
 
-        <div class="card shadow-lg border-0"
-            style="border-radius: 15px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); color:#fff;">
+        <div class="card shadow-lg border-0 custom-form">
             <div class="card-body p-4">
                 <form action="{{ route('cpmks.store') }}" method="POST">
                     @csrf
