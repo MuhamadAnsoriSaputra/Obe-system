@@ -144,9 +144,7 @@
                                 <td>{{ $item->kode_cpmk }}</td>
                                 <td>{{ $item->bobot }}</td>
                                 <td>
-                                    <form
-                                        action="{{ route('mata_kuliahs.removeCpmk', ['kode_mk' => $mataKuliah->kode_mk, 'kode_cpmk' => $cpmk->kode_cpmk]) }}"
-                                        method="POST">
+                                    <form action="{{ route('mata_kuliahs.removeCpmk', $item->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm"

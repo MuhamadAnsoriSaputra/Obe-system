@@ -72,22 +72,24 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('mahasiswas', MahasiswaController::class);
         Route::resource('cpls', CplController::class);
         Route::resource('cpmks', CpmkController::class);
-        Route::prefix('rumusan')->middleware(['role:admin,kaprodi,akademik'])->group(function () {
-            Route::get('/', [RumusanController::class, 'index'])->name('rumusan.index');
-            Route::get('/mata_kuliah', [RumusanController::class, 'rumusanMatkul'])->name('rumusan.mata_kuliah');
-            Route::get('/cpl', [RumusanController::class, 'rumusanCpl'])->name('rumusan.cpl');
-        });
         Route::resource('mata_kuliahs', MataKuliahController::class);
         Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
+        Route::delete('/mata_kuliahs/remove-cpmk/{id}', [MataKuliahController::class, 'removeCpmk'])
+            ->name('mata_kuliahs.removeCpmk');
         Route::resource('dosens', DosenController::class);
         Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
-
-        // Halaman input nilai per mata kuliah
         Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
-
-        // Simpan nilai
         Route::post('/penilaian/{kode_mk}/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
     });
+
+    Route::prefix('rumusan')->middleware(['role:admin,kaprodi,akademik'])->name('rumusan.')->group(function () {
+        Route::get('/', [RumusanController::class, 'index'])->name('index');
+        Route::get('/mata_kuliah', [RumusanController::class, 'rumusanMatkul'])->name('mata_kuliah');
+        Route::get('/cpl', [RumusanController::class, 'rumusanCpl'])->name('cpl');
+    });
+
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -99,9 +101,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('mahasiswas', MahasiswaController::class);
         Route::resource('cpls', CplController::class);
         Route::resource('cpmks', CpmkController::class);
-        Route::resource('rumusan', RumusanController::class);
-        Route::get('/rumusan/mata_kuliah', [RumusanController::class, 'mata_kuliah'])->name('rumusan.mata_kuliah');
-        Route::get('/rumusan/cpl', [RumusanController::class, 'cpl'])->name('rumusan.cpl');
         Route::resource('mata_kuliahs', MataKuliahController::class);
         Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
         Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])
@@ -139,9 +138,6 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:admin,kaprodi'])->group(function () {
-        Route::resource('rumusan', RumusanController::class);
-        Route::get('/rumusan/mata_kuliah', [RumusanController::class, 'mata_kuliah'])->name('rumusan.mata_kuliah');
-        Route::get('/rumusan/cpl', [RumusanController::class, 'cpl'])->name('rumusan.cpl');
         Route::resource('mahasiswas', MahasiswaController::class);
     });
 

@@ -13,7 +13,7 @@ class RumusanController extends Controller
         return view('rumusan.index');
     }
 
-    public function rumusanMatkul()
+    public function mata_kuliah()
     {
         $mataKuliahs = MataKuliah::with([
             'cpmks.cpl',
@@ -44,7 +44,7 @@ class RumusanController extends Controller
         return view('rumusan.matakuliah', compact('data'));
     }
 
-    public function rumusanCpl()
+    public function cpl()
     {
         $cpls = Cpl::with([
             'cpmks.mataKuliahs' => function ($q) {
