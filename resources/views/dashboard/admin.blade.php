@@ -3,9 +3,9 @@
 @section('content')
     <style>
         body {
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            background: linear-gradient(135deg, #f3f6fc, #eaf0ff);
             font-family: 'Poppins', sans-serif;
-            color: #fff;
+            color: #1e3c72;
         }
 
         .dashboard-container {
@@ -14,9 +14,11 @@
 
         h2.title {
             font-weight: 700;
+            color: #1e3c72;
             margin-bottom: 30px;
         }
 
+        /* === STAT CARDS === */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -24,68 +26,62 @@
         }
 
         .card-stat {
-            background: rgba(255, 255, 255, 0.1);
+            background: #ffffff;
             border-radius: 15px;
             padding: 20px;
             text-align: center;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            border: 1px solid #d3dcff;
+            box-shadow: 0 6px 12px rgba(30, 60, 114, 0.1);
         }
 
         .card-stat:hover {
-            transform: translateY(-6px);
-            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-4px);
+            background: #f9fbff;
+            box-shadow: 0 8px 18px rgba(30, 60, 114, 0.15);
         }
 
         .card-stat i {
             font-size: 36px;
-            margin-bottom: 10px;
-            color: #00d4ff;
+            margin-bottom: 12px;
+            color: #2a5298;
         }
 
         .card-stat .number {
             font-size: 28px;
             font-weight: 700;
+            color: #1e3c72;
         }
 
         .card-stat .label {
             font-size: 14px;
-            opacity: 0.8;
+            color: #5068a9;
+            opacity: 0.9;
         }
 
+        /* === CHART === */
         .chart-container {
-            background: rgba(255, 255, 255, 0.08);
+            background: #ffffff;
             border-radius: 15px;
             padding: 20px;
             margin-top: 40px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+            border: 1px solid #d3dcff;
+            box-shadow: 0 6px 12px rgba(30, 60, 114, 0.1);
         }
 
-        .quick-links {
-            margin-top: 40px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .quick-links a {
-            background: linear-gradient(135deg, #00d4ff, #0077ff);
-            color: white;
-            padding: 10px 18px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .quick-links a:hover {
-            background: linear-gradient(135deg, #0099ff, #005cff);
-            transform: scale(1.05);
+        h5 {
+            color: #1e3c72;
+            font-weight: 600;
         }
 
         canvas {
             width: 100% !important;
             height: 320px !important;
+        }
+
+        /* === REMOVE QUICK LINKS === */
+        .quick-links {
+            display: none;
         }
     </style>
 
@@ -139,15 +135,6 @@
             <h5 class="fw-semibold mb-3">Rata-rata Capaian CPL</h5>
             <canvas id="chartCPL"></canvas>
         </div>
-
-        <div class="quick-links">
-            <a href="{{ url('/users') }}"><i class="fas fa-users me-1"></i> Kelola Pengguna</a>
-            <a href="{{ url('/prodis') }}"><i class="fas fa-building-columns me-1"></i> Kelola Prodi</a>
-            <a href="{{ url('/angkatans') }}"><i class="fas fa-calendar-plus me-1"></i> Tambah Angkatan</a>
-            <a href="{{ url('/mata_kuliahs') }}"><i class="fas fa-book me-1"></i> Mata Kuliah</a>
-            <a href="{{ url('/penilaian') }}"><i class="fas fa-chart-line me-1"></i> Penilaian</a>
-            <a href="{{ url('/hasil') }}"><i class="fas fa-chart-pie me-1"></i> Hasil OBE</a>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -161,13 +148,27 @@
                     label: 'Rata-rata Capaian (%)',
                     data: {!! json_encode($capaianCPL->pluck('rata')) !!},
                     borderWidth: 1,
-                    backgroundColor: 'rgba(0,212,255,0.7)',
-                    borderColor: '#00d4ff'
+                    backgroundColor: 'rgba(42, 82, 152, 0.7)',
+                    borderColor: '#2a5298'
                 }]
             },
             options: {
                 scales: {
-                    y: { beginAtZero: true, max: 100 }
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { color: '#1e3c72' },
+                        grid: { color: 'rgba(30,60,114,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#1e3c72' },
+                        grid: { color: 'rgba(30,60,114,0.1)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#1e3c72' }
+                    }
                 }
             }
         });
