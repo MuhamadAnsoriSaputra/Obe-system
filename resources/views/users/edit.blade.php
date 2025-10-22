@@ -1,3 +1,7 @@
+@push('styles')
+    <link href="{{ asset('css/edit.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('content')
@@ -34,8 +38,13 @@
 
                 <div class="mb-3">
                     <label for="password" class="form-label">Password (kosongkan jika tidak diubah)</label>
-                    <input type="password" name="password" id="password"
-                        class="form-control @error('password') is-invalid @enderror">
+                    <div class="input-group">
+                        <input type="password" name="password" id="password"
+                            class="form-control @error('password') is-invalid @enderror">
+                        <span class="input-group-text bg-transparent text-white">
+                            <i class="fa-solid fa-eye toggle-password" style="cursor:pointer;"></i>
+                        </span>
+                    </div>
                     @error('password')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -56,7 +65,6 @@
                     @enderror
                 </div>
 
-                {{-- Field Prodi (muncul hanya untuk akademik/kaprodi) --}}
                 <div class="mb-3" id="prodiField" style="display: none;">
                     <label for="kode_prodi" class="form-label">Program Studi</label>
                     <select name="kode_prodi" id="kode_prodi" class="form-select @error('kode_prodi') is-invalid @enderror">
@@ -85,7 +93,6 @@
     </div>
 </div>
 
-{{-- Script untuk menampilkan field prodi otomatis --}}
 <script>
     const roleSelect = document.getElementById('role');
     const prodiField = document.getElementById('prodiField');
@@ -99,9 +106,7 @@
         }
     }
 
-    // jalankan saat halaman pertama kali dimuat
     toggleProdiField();
-    // dan juga setiap kali role berubah
     roleSelect.addEventListener('change', toggleProdiField);
 </script>
 @endsection

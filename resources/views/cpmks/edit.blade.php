@@ -1,3 +1,7 @@
+@push('styles')
+    <link href="{{ asset('css/edit.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('content')
@@ -20,7 +24,8 @@
                     <div class="mb-3">
                         <label for="deskripsi_cpmk" class="form-label">Deskripsi CPMK</label>
                         <textarea name="deskripsi_cpmk" id="deskripsi_cpmk" rows="3"
-                            class="form-control @error('deskripsi_cpmk') is-invalid @enderror">{{ old('deskripsi_cpmk', $cpmk->deskripsi_cpmk) }}</textarea>
+                            class="form-control @error('deskripsi_cpmk') is-invalid @enderror"
+                            required>{{ old('deskripsi_cpmk', $cpmk->deskripsi_cpmk) }}</textarea>
                         @error('deskripsi_cpmk')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -31,14 +36,14 @@
                         <select name="kode_cpl" id="kode_cpl" class="form-select" required>
                             @foreach($cpls as $cpl)
                                 <option value="{{ $cpl->kode_cpl }}" {{ $cpmk->kode_cpl == $cpl->kode_cpl ? 'selected' : '' }}>
-                                    {{ $cpl->kode_cpl }} - {{ $cpl->deskripsi_cpl }}
+                                    {{ $cpl->kode_cpl }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <a href="{{ route('cpmks.index') }}" class="btn btn-secondary me-2">Batal</a>
+                        <a href="{{ route('cpmks.index') }}" class="btn btn-secondary me-2 px-4">Batal</a>
                         <button type="submit" class="btn btn-light fw-bold px-4">
                             <i class="fas fa-save me-2"></i> Simpan Perubahan
                         </button>

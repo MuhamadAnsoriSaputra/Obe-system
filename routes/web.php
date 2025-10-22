@@ -15,6 +15,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RumusanController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\HasilObeController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -170,7 +171,9 @@ Route::middleware(['auth'])->group(function () {
     | DASHBOARD PER ROLE (VIEW STATIS)
     |--------------------------------------------------------------------------
     */
-    Route::view('/dashboard/admin', 'dashboard.admin')->name('dashboard.admin');
+    Route::get('/dashboard/admin', [DashboardController::class, 'index'])
+        ->middleware('auth')
+        ->name('dashboard.admin');
     Route::view('/dashboard/akademik', 'dashboard.akademik')->name('dashboard.akademik');
     Route::view('/dashboard/dosen', 'dashboard.dosen')->name('dashboard.dosen');
     Route::view('/dashboard/kaprodi', 'dashboard.kaprodi')->name('dashboard.kaprodi');

@@ -1,3 +1,7 @@
+@push('styles')
+    <link href="{{ asset('css/edit.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('content')
@@ -14,17 +18,20 @@
 
                 <div class="mb-3">
                     <label for="nim" class="form-label">NIM</label>
-                    <input type="text" name="nim" class="form-control" value="{{ $mahasiswa->nim }}" readonly>
+                    <input type="text" name="nim" class="form-control" 
+                           value="{{ $mahasiswa->nim }}" readonly>
                 </div>
 
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama Mahasiswa</label>
-                    <input type="text" name="nama" class="form-control" value="{{ $mahasiswa->nama }}" required>
+                    <input type="text" name="nama" class="form-control" 
+                           value="{{ $mahasiswa->nama }}" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" value="{{ $mahasiswa->email }}" required>
+                    <input type="email" name="email" class="form-control" 
+                           value="{{ $mahasiswa->email }}" required>
                 </div>
 
                 @if(auth()->user()->role === 'admin')
@@ -34,7 +41,7 @@
                             @foreach($prodis as $prodi)
                                 <option value="{{ $prodi->kode_prodi }}"
                                     {{ $mahasiswa->kode_prodi == $prodi->kode_prodi ? 'selected' : '' }}>
-                                    {{ $prodi->nama_prodi }}
+                                    {{ $prodi->nama_prodi }} ({{ $prodi->jenjang }})
                                 </option>
                             @endforeach
                         </select>

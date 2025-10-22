@@ -1,0 +1,76 @@
+/* === FORM CONTAINER === */
+.container {
+    margin-top: 10px;
+}
+
+h2 {
+    color: #1e3c72;
+    font-weight: 700;
+}
+
+/* === CARD STYLE === */
+.card {
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    color: #1e3c72;
+    padding: 20px;
+}
+
+/* === INPUTS === */
+.form-label {
+    font-weight: 600;
+    color: #1e3c72;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid #d3dcff;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #2a5298;
+    box-shadow: 0 0 5px rgba(42, 82, 152, 0.4);
+}
+
+/* === BUTTONS === */
+.btn-secondary {
+    background: #ff5c5c;
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 6px 20px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.btn-secondary:hover {
+    background: #e44b4b;
+}
+
+.btn-light {
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.btn-light:hover {
+    background: linear-gradient(135deg, #3a5fcf, #24488f);
+}
+
+/* === TOGGLE PASSWORD ICON === */
+.input-group-text {
+    border-radius: 8px;
+    border: 1px solid #d3dcff;
+}
+
+/* === FIELD WRAPPER === */
+.mb-3 {
+    margin-bottom: 15px;
+}
