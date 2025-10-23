@@ -2,63 +2,159 @@
 
 @section('content')
     <style>
-        .dashboard-card {
+        body {
+            background: linear-gradient(135deg, #f3f6fc, #eaf0ff);
+            font-family: 'Poppins', sans-serif;
+            color: #1e3c72;
+        }
+
+        .dashboard-container {
+            padding: 30px;
+        }
+
+        h2.title {
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 30px;
+        }
+
+        /* === STAT CARDS === */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+        }
+
+        .card-stat {
             background: #ffffff;
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 20px;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            border: 1px solid #d3dcff;
+            box-shadow: 0 6px 12px rgba(30, 60, 114, 0.1);
         }
 
-        .dashboard-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+        .card-stat:hover {
+            transform: translateY(-4px);
+            background: #f9fbff;
+            box-shadow: 0 8px 18px rgba(30, 60, 114, 0.15);
         }
 
-        .dashboard-card i {
-            font-size: 32px;
-            margin-bottom: 8px;
+        .card-stat i {
+            font-size: 36px;
+            margin-bottom: 12px;
+            color: #2a5298;
         }
 
-        body {
-            background: #f5f6fa !important;
+        .card-stat .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+
+        .card-stat .label {
+            font-size: 14px;
+            color: #5068a9;
+            opacity: 0.9;
+        }
+
+        /* === CHART === */
+        .chart-container {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 40px;
+            border: 1px solid #d3dcff;
+            box-shadow: 0 6px 12px rgba(30, 60, 114, 0.1);
+        }
+
+        h5 {
+            color: #1e3c72;
+            font-weight: 600;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 320px !important;
+        }
+
+        /* === REMOVE QUICK LINKS === */
+        .quick-links {
+            display: none;
         }
     </style>
 
-    <div class="container-fluid">
-        <h2 class="fw-bold mb-4">Dashboard Akademik</h2>
+    <div class="dashboard-container">
+        <h2 class="title">Dashboard Akademik Prodi</h2>
 
-        {{-- Cards Statistik --}}
-        <div class="row g-4 mb-4">
-            <div class="col-md-3">
-                <div class="dashboard-card">
-                    <i class="fas fa-users"></i>
-                    <h6>Total Mahasiswa Terdaftar</h6>
-                    <h3>{{ $stats['mahasiswa'] ?? 0 }}</h3>
-                </div>
+        <div class="stats">
+            <div class="card-stat">
+                <i class="fas fa-calendar-alt"></i>
+                <div class="number">{{ $jumlahAngkatan }}</div>
+                <div class="label">Tahun Angkatan</div>
             </div>
-            <div class="col-md-3">
-                <div class="dashboard-card">
-                    <i class="fas fa-book"></i>
-                    <h6>Program Studi Aktif</h6>
-                    <h3>{{ $stats['prodi'] ?? 0 }}</h3>
-                </div>
+            <div class="card-stat">
+                <i class="fas fa-user-graduate"></i>
+                <div class="number">{{ $jumlahMahasiswa }}</div>
+                <div class="label">Mahasiswa</div>
             </div>
-            <div class="col-md-3">
-                <div class="dashboard-card">
-                    <i class="fas fa-file-alt"></i>
-                    <h6>Mata Kuliah Terdata</h6>
-                    <h3>{{ $stats['mk'] ?? 0 }}</h3>
-                </div>
+            <div class="card-stat">
+                <i class="fas fa-bullseye"></i>
+                <div class="number">{{ $jumlahCPL }}</div>
+                <div class="label">CPL</div>
             </div>
-            <div class="col-md-3">
-                <div class="dashboard-card">
-                    <i class="fas fa-calendar-check"></i>
-                    <h6>Tahun Kurikulum Aktif</h6>
-                    <h3>{{ $stats['kurikulum'] ?? 0 }}</h3>
-                </div>
+            <div class="card-stat">
+                <i class="fas fa-tasks"></i>
+                <div class="number">{{ $jumlahCPMK }}</div>
+                <div class="label">CPMK</div>
+            </div>
+            <div class="card-stat">
+                <i class="fas fa-book"></i>
+                <div class="number">{{ $jumlahMataKuliah }}</div>
+                <div class="label">Mata Kuliah</div>
             </div>
         </div>
+
+        <div class="chart-container mt-5">
+            <h5 class="fw-semibold mb-3">Distribusi CPL per Angkatan</h5>
+            <canvas id="chartCPLAkademik"></canvas>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('chartCPLAkademik');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($capaianCPL->pluck('angkatan')) !!},
+                datasets: [{
+                    label: 'Jumlah CPL',
+                    data: {!! json_encode($capaianCPL->pluck('total')) !!},
+                    borderWidth: 1,
+                    backgroundColor: 'rgba(42, 82, 152, 0.7)',
+                    borderColor: '#2a5298'
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#1e3c72' },
+                        grid: { color: 'rgba(30,60,114,0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#1e3c72' },
+                        grid: { color: 'rgba(30,60,114,0.1)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#1e3c72' }
+                    }
+                }
+            }
+        });
+    </script>
 @endsection

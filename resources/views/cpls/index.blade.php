@@ -1,5 +1,65 @@
 @push('styles')
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
+    <style>
+        /* Tambahan styling khusus tabel CPL */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table.table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.table th,
+        table.table td {
+            vertical-align: middle;
+            white-space: nowrap;
+            /* agar teks tidak turun ke bawah kecuali kolom deskripsi */
+        }
+
+        table.table td.deskripsi {
+            white-space: normal;
+            /* kolom deskripsi boleh multi-baris */
+            width: 50%;
+            /* atur lebar deskripsi agak sempit agar kolom lain muat */
+        }
+
+        table.table th:nth-child(1) {
+            width: 5%;
+            text-align: center;
+        }
+
+        table.table th:nth-child(2) {
+            width: 10%;
+        }
+
+        table.table th:nth-child(3) {
+            width: 55%;
+        }
+
+        table.table th:nth-child(4) {
+            width: 15%;
+            text-align: center;
+        }
+
+        table.table th:nth-child(5) {
+            width: 15%;
+            text-align: center;
+        }
+
+        /* Tombol aksi sejajar */
+        .aksi-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .aksi-buttons form {
+            display: inline;
+        }
+    </style>
 @endpush
 
 @extends('layouts.app')
@@ -18,7 +78,7 @@
 
         {{-- Tombol Tambah + Search --}}
         <div class="top-actions">
-            @if(auth()->user()->role === 'akademik') {{-- Hanya tampil untuk akademik --}}
+            @if(auth()->user()->role === 'akademik')
                 <a href="{{ route('cpls.create') }}" class="btn-tambah">
                     <i class="fas fa-plus me-2"></i> Tambah CPL
                 </a>
@@ -47,8 +107,8 @@
                         <th class="text-center">No</th>
                         <th>Kode CPL</th>
                         <th>Deskripsi</th>
-                        <th>Kurikulum</th>
-                        @if(auth()->user()->role === 'akademik') {{-- Kolom aksi hanya untuk akademik --}}
+                        <th class="text-center">Kurikulum</th>
+                        @if(auth()->user()->role === 'akademik')
                             <th class="text-center">Aksi</th>
                         @endif
                     </tr>
@@ -58,28 +118,31 @@
                         <tr>
                             <td class="text-center">{{ $loop->iteration + ($cpls->firstItem() - 1) }}</td>
                             <td>{{ $cpl->kode_cpl }}</td>
-                            <td>{{ $cpl->deskripsi }}</td>
-                            <td>{{ $cpl->angkatan->tahun ?? '-' }}</td>
+                            <td class="deskripsi">{{ $cpl->deskripsi }}</td>
+                            <td class="text-center">{{ $cpl->angkatan->tahun ?? '-' }}</td>
 
-                            @if(auth()->user()->role === 'akademik') {{-- Tombol edit/hapus hanya untuk akademik --}}
-                                <td>
-                                    <a href="{{ route('cpls.edit', $cpl->kode_cpl) }}" class="btn btn-sm btn-warning">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('cpls.destroy', $cpl->kode_cpl) }}" method="POST" class="d-inline"
-                                        onsubmit="return confirm('Yakin hapus CPL ini?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                            @if(auth()->user()->role === 'akademik')
+                                <td class="text-center">
+                                    <div class="aksi-buttons">
+                                        <a href="{{ route('cpls.edit', $cpl->kode_cpl) }}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('cpls.destroy', $cpl->kode_cpl) }}" method="POST"
+                                            onsubmit="return confirm('Yakin hapus CPL ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ auth()->user()->role === 'akademik' ? 5 : 4 }}" class="text-center">Belum ada CPL
+                            <td colspan="{{ auth()->user()->role === 'akademik' ? 5 : 4 }}" class="text-center">
+                                Belum ada CPL
                             </td>
                         </tr>
                     @endforelse

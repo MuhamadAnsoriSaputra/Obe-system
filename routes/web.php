@@ -15,7 +15,12 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RumusanController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\HasilObeController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardAdminController;
+use App\Http\Controllers\DashboardAkademikController;
+use App\Http\Controllers\DosenDashboardController;
+use App\Http\Controllers\DashboardKaprodiController;
+use App\Http\Controllers\DashboardWadir1Controller;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -139,6 +144,7 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::middleware(['role:admin,akademik,kaprodi'])->group(function () {
         Route::resource('mahasiswas', MahasiswaController::class);
+
     });
 
     /*
@@ -147,6 +153,11 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:admin,wadir1,akademik,kaprodi'])->group(function () {
+        Route::resource('mahasiswas', MahasiswaController::class);
+
+    });
+
+    Route::middleware(['auth', 'role:admin,akademik,kaprodi,wadir1'])->group(function () {
         Route::resource('mahasiswas', MahasiswaController::class);
     });
 
@@ -171,11 +182,19 @@ Route::middleware(['auth'])->group(function () {
     | DASHBOARD PER ROLE (VIEW STATIS)
     |--------------------------------------------------------------------------
     */
-    Route::get('/dashboard/admin', [DashboardController::class, 'index'])
+    Route::get('/dashboard/admin', [DashboardAdminController::class, 'index'])
         ->middleware('auth')
         ->name('dashboard.admin');
-    Route::view('/dashboard/akademik', 'dashboard.akademik')->name('dashboard.akademik');
-    Route::view('/dashboard/dosen', 'dashboard.dosen')->name('dashboard.dosen');
-    Route::view('/dashboard/kaprodi', 'dashboard.kaprodi')->name('dashboard.kaprodi');
-    Route::view('/dashboard/wadir1', 'dashboard.wadir1')->name('dashboard.wadir1');
+    Route::get('/dashboard/akademik', [DashboardAkademikController::class, 'akademik'])
+        ->name('dashboard.akademik')
+        ->middleware('auth');
+    Route::get('/dashboard/dosen', [DosenDashboardController::class, 'index'])
+        ->name('dashboard.dosen')
+        ->middleware(['auth', 'role:dosen']);
+    Route::get('/dashboard/kaprodi', [DashboardKaprodiController::class, 'index'])
+        ->name('dashboard.kaprodi')
+        ->middleware('auth');
+    Route::get('/dashboard/wadir1', [DashboardWadir1Controller::class, 'index'])
+        ->name('dashboard.wadir1')
+        ->middleware('auth');
 });

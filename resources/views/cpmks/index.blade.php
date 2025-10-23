@@ -1,5 +1,46 @@
 @push('styles')
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
+
+    <style>
+        /* === Perbaikan tampilan tabel CPMK agar rapi seperti CPL === */
+
+        /* Membuat teks panjang di kolom deskripsi turun ke bawah */
+        .table td {
+            white-space: normal !important;
+            word-wrap: break-word;
+            vertical-align: top;
+        }
+
+        /* Batas lebar maksimal setiap kolom agar tabel proporsional */
+        .table th,
+        .table td {
+            max-width: 350px;
+        }
+
+        /* Kolom deskripsi (ke-4) biar bisa multi-line */
+        .table td:nth-child(4) {
+            white-space: pre-line;
+        }
+
+        /* Kolom aksi biar ikon sejajar horizontal */
+        .table td:last-child {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Tombol edit dan hapus seragam */
+        .table .btn-warning,
+        .table .btn-danger {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+    </style>
 @endpush
 
 @extends('layouts.app')
@@ -47,7 +88,7 @@
                         <th>Kode CPMK</th>
                         <th>Deskripsi</th>
                         @if(auth()->user()->role === 'akademik')
-                            <th>Aksi</th>
+                            <th class="text-center">Aksi</th>
                         @endif
                     </tr>
                 </thead>

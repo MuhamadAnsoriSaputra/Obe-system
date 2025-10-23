@@ -116,7 +116,7 @@ class MahasiswaController extends Controller
             'tahun_lulus' => $request->tahun_lulus,
         ];
 
-        // Hanya admin yang bisa ubah prodi
+        // Hanya admin   yang bisa ubah prodi
         if ($user->role === 'admin') {
             $data['kode_prodi'] = $request->kode_prodi;
         }

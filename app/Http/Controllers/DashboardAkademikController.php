@@ -13,11 +13,11 @@ use App\Models\Cpmk;
 use App\Models\Penilaian;
 use App\Models\HasilObe;
 
-class DashboardController extends Controller
+class DashboardAkademikController extends Controller
 {
-    public function index()
+    public function akademik()
     {
-        return view('dashboard.admin', [
+        return view('dashboard.akademik', [
             'jumlahProdi' => Prodi::count(),
             'jumlahAngkatan' => Angkatan::count(),
             'jumlahDosen' => Dosen::count(),
@@ -27,8 +27,8 @@ class DashboardController extends Controller
             'jumlahCPMK' => Cpmk::count(),
             'jumlahPenilaian' => Penilaian::count(),
             'capaianCPL' => HasilObe::selectRaw('kode_cpl, ROUND(AVG(capaian_persentase),2) as rata')
-                                    ->groupBy('kode_cpl')
-                                    ->get(),
+                ->groupBy('kode_cpl')
+                ->get(),
         ]);
     }
 }

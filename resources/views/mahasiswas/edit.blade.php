@@ -34,6 +34,29 @@
                            value="{{ $mahasiswa->email }}" required>
                 </div>
 
+                {{-- Tambahkan bagian tahun masuk dan lulus --}}
+                <div class="mb-3">
+                    <label for="tahun_masuk" class="form-label">Tahun Masuk</label>
+                    <input type="number" name="tahun_masuk" id="tahun_masuk"
+                        class="form-control @error('tahun_masuk') is-invalid @enderror"
+                        value="{{ old('tahun_masuk', $mahasiswa->tahun_masuk) }}" required>
+                    @error('tahun_masuk')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="tahun_lulus" class="form-label">Tahun Lulus (Opsional)</label>
+                    <input type="number" name="tahun_lulus" id="tahun_lulus"
+                        class="form-control @error('tahun_lulus') is-invalid @enderror"
+                        value="{{ old('tahun_lulus', $mahasiswa->tahun_lulus) }}"
+                        placeholder="Kosongkan jika belum lulus">
+                    @error('tahun_lulus')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                {{-- Selesai bagian tambahan --}}
+
                 @if(auth()->user()->role === 'admin')
                     <div class="mb-3">
                         <label for="kode_prodi" class="form-label">Program Studi</label>
