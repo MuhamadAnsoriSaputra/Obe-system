@@ -86,6 +86,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
         Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
         Route::post('/penilaian/{kode_mk}/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
+        Route::get('/penilaian/import/{kode_mk}', [PenilaianController::class, 'showImportForm'])->name('penilaian.import.form');
+        Route::post('/penilaian/import/{kode_mk}', [PenilaianController::class, 'importExcel'])->name('penilaian.import');
     });
 
     Route::prefix('rumusan')->middleware(['role:admin,kaprodi,akademik'])->name('rumusan.')->group(function () {
@@ -129,6 +131,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('mata_kuliahs.removeCpmk');
         Route::resource('penilaian', PenilaianController::class);
         Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
+        Route::get('/penilaian/import/{kode_mk}', [PenilaianController::class, 'showImportForm'])->name('penilaian.import.form');
+        Route::post('/penilaian/import/{kode_mk}', [PenilaianController::class, 'importExcel'])->name('penilaian.import');  
 
         // Halaman input nilai per mata kuliah
         Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');

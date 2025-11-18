@@ -9,6 +9,19 @@
             <div class="alert alert-success mt-3">{{ session('success') }}</div>
         @endif
 
+        <form action="{{ route('penilaian.import', $matakuliah->kode_mk) }}" method="POST" enctype="multipart/form-data"
+            class="mb-4">
+            @csrf
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-success w-100">📥 Import Excel</button>
+                </div>
+            </div>
+        </form>
+
         {{-- Form Input Nilai --}}
         <form action="{{ route('penilaian.store', $matakuliah->kode_mk) }}" method="POST" class="mb-4">
             @csrf

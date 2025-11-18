@@ -13,7 +13,7 @@ class CplController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $search = $request->input('search');
+        $search = $request->input('search');    
 
         $cpls = Cpl::with(['prodi', 'angkatan'])
             ->when($user->role === 'akademik' && $user->kode_prodi, function ($query) use ($user) {

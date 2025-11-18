@@ -9,13 +9,13 @@ use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
 {
-    // 🟣 Tampilkan halaman login
+    // Tampilkan halaman login
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    // 🟢 Proses login manual (email & password)
+    //  Proses login manual (email & password)
     public function login(Request $request)
     {
         $request->validate([
@@ -52,7 +52,7 @@ class LoginController extends Controller
         ])->onlyInput('email');
     }
 
-    // 🔴 Logout
+    //  Logout
     public function logout(Request $request)
     {
         Auth::logout();
@@ -61,20 +61,20 @@ class LoginController extends Controller
         return redirect('/login');
     }
 
-    // 🟡 Redirect ke Google
+    // Redirect ke Google
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
 
-    // 🟢 Callback dari Google
+    // Callback dari Google
     public function handleGoogleCallback()
     {
         try {
             $googleUser = Socialite::driver('google')->user();
             $email = $googleUser->getEmail();
 
-            // ✅ Daftar domain yang diizinkan
+            // Daftar domain yang diizinkan
             $allowedDomains = ['politala.ac.id', 'mhs.politala.ac.id'];
 
             // Ambil domain dari email

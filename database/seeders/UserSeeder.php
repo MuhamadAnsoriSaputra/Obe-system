@@ -47,6 +47,18 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'google_id' => null,
+                'password' => Hash::make('123456'),
+                'kode_prodi' => 'TI',
+                'role' => 'akademik',
+                'nama' => 'Akademik',
+                'email' => 'rendirudi106@mhs.politala.ac.id',
+                'foto' => null,
+                'remember_token' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }
