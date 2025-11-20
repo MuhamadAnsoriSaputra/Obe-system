@@ -48,6 +48,10 @@ Route::get('/', fn() => redirect()->route('dashboard'));
 */
 Route::middleware(['auth'])->group(function () {
 
+    // PERANGKINGAN SAW
+    Route::middleware(['role:admin,akademik,kaprodi,wadir1'])
+        ->get('/perangkingan', [\App\Http\Controllers\PerangkinganController::class, 'index'])
+        ->name('perangkingan.index');
     /*
     |--------------------------------------------------------------------------
     | DASHBOARD REDIRECT PER ROLE
@@ -132,7 +136,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('penilaian', PenilaianController::class);
         Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
         Route::get('/penilaian/import/{kode_mk}', [PenilaianController::class, 'showImportForm'])->name('penilaian.import.form');
-        Route::post('/penilaian/import/{kode_mk}', [PenilaianController::class, 'importExcel'])->name('penilaian.import');  
+        Route::post('/penilaian/import/{kode_mk}', [PenilaianController::class, 'importExcel'])->name('penilaian.import');
 
         // Halaman input nilai per mata kuliah
         Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
