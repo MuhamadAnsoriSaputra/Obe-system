@@ -20,6 +20,7 @@ use App\Http\Controllers\DashboardAkademikController;
 use App\Http\Controllers\DosenDashboardController;
 use App\Http\Controllers\DashboardKaprodiController;
 use App\Http\Controllers\DashboardWadir1Controller;
+use App\Http\Controllers\PerangkinganController;
 
 
 /*
@@ -48,10 +49,21 @@ Route::get('/', fn() => redirect()->route('dashboard'));
 */
 Route::middleware(['auth'])->group(function () {
 
-    // PERANGKINGAN SAW
-    Route::middleware(['role:admin,akademik,kaprodi,wadir1'])
-        ->get('/perangkingan', [\App\Http\Controllers\PerangkinganController::class, 'index'])
-        ->name('perangkingan.index');
+    Route::middleware(['role:admin,akademik,kaprodi,wadir1'])->group(function () {
+
+        // Halaman utama perangkingan
+        Route::get('/perangkingan', [PerangkinganController::class, 'index'])
+            ->name('perangkingan.index');
+
+        // Atur bobot
+        Route::get('/perangkingan/bobot', [PerangkinganController::class, 'bobotIndex'])
+            ->name('perangkingan.bobot');
+
+        // Simpan bobot
+        Route::post('/perangkingan/bobot/simpan', [PerangkinganController::class, 'bobotSimpan'])
+            ->name('perangkingan.bobot.simpan');
+    });
+
     /*
     |--------------------------------------------------------------------------
     | DASHBOARD REDIRECT PER ROLE
@@ -116,8 +128,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])->name('mata_kuliahs.simpanBobot');
         Route::post('/mata_kuliahs/{kode_mk}/simpan-bobot', [MataKuliahController::class, 'simpanBobot'])
             ->name('mata_kuliahs.simpanBobot');
-        Route::delete('/mata_kuliahs/{kode_mk}/remove-cpmk/{kode_cpmk}', [MataKuliahController::class, 'removeCpmk'])
-            ->name('mata_kuliahs.removeCpmk');
         Route::resource('dosens', DosenController::class);
     });
 
@@ -143,6 +153,14 @@ Route::middleware(['auth'])->group(function () {
 
         // Simpan nilai
         Route::post('/penilaian/{kode_mk}/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
+        Route::middleware(['role:admin,dosen,akademik'])->group(function () {
+
+            Route::delete(
+                '/mata_kuliahs/remove-cpmk/{id}',
+                [MataKuliahController::class, 'removeCpmk']
+            )->name('mata_kuliahs.removeCpmk');
+
+        });
     });
 
     /*

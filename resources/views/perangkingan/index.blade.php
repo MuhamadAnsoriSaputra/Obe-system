@@ -1,3 +1,7 @@
+@push('styles')
+    <link href="{{ asset('css/index.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('title', 'Perangkingan')
@@ -5,6 +9,11 @@
 @section('content')
     <div class="container-fluid">
         <h2 class="fw-bold mb-4">Perangkingan Mahasiswa</h2>
+
+        {{-- Tombol Atur Bobot --}}
+        <a href="{{ route('perangkingan.bobot') }}" class="btn-tambah btn-kembali mb-3">
+            <i class="fas fa-sliders-h me-2"></i> Atur Bobot
+        </a>
 
         {{-- Dropdown Angkatan --}}
         <form method="GET" action="{{ route('perangkingan.index') }}" class="mb-4">

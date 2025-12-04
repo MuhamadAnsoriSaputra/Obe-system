@@ -1,3 +1,7 @@
+@push('styles')
+    <link href="{{ asset('css/index.css') }}" rel="stylesheet">
+@endpush
+
 @extends('layouts.app')
 
 @section('content')

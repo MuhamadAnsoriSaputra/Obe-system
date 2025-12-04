@@ -16,6 +16,13 @@
             <div class="card-body">
                 <h5 class="fw-bold mb-3">CPMK & Bobot</h5>
 
+
+                @if ($errors->has('bobot'))
+                    <div class="alert alert-danger">
+                        {{ $errors->first('bobot') }}
+                    </div>
+                @endif
+
                 {{-- Form tambah/ubah bobot --}}
                 <form id="formBobot" action="{{ route('mata_kuliahs.simpanBobot', $mataKuliah->kode_mk) }}" method="POST">
                     @csrf
