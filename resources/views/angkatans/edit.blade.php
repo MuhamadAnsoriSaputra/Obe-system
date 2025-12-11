@@ -2,6 +2,8 @@
     <link href="{{ asset('css/edit.css') }}" rel="stylesheet">
 @endpush
 
+@section('title', 'Kurikulum | Edit')
+
 @extends('layouts.app')
 
 @section('content')

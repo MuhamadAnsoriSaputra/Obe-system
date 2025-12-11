@@ -1,3 +1,5 @@
+@section('title', 'Manajemen CPL')
+
 @push('styles')
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
     <style>

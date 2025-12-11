@@ -1,3 +1,5 @@
+@section('title', 'KOMPAS | Login')
+
 <!DOCTYPE html>
 <html lang="id">
 

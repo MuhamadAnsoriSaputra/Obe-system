@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Dashboard | Kaprodi')
+
 @section('content')
     <style>
         body {

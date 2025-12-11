@@ -2,6 +2,8 @@
         <link href="{{ asset('css/index.css') }}" rel="stylesheet">
     @endpush
 
+    @section('title', 'Manajemen User')
+
     @extends('layouts.app')
 
     @section('content')

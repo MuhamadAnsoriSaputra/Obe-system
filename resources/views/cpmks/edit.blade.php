@@ -4,6 +4,8 @@
 
 @extends('layouts.app')
 
+@section('title', 'CPMK | Edit')
+
 @section('content')
     <div class="container">
         <h2 class="fw-bold mb-4">Edit CPMK</h2>

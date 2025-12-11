@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Dashboard | Akademik')
+
 @section('content')
     <style>
         body {

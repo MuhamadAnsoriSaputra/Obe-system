@@ -1,10 +1,16 @@
 @extends('layouts.app')
 
+@section('title', 'Rumusan Per MK')
+
+@push('styles')
+    <link href="{{ asset('css/index.css') }}" rel="stylesheet">
+@endpush
+
 @section('content')
 <div class="container">
     <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
         <div class="card-header fw-bold" style="background: #f5f5f5;">
-            <h4 class="mb-0">📊 Rumusan Akhir Mata Kuliah</h4>
+            <h4 class="mb-0"> Rumusan Akhir Mata Kuliah</h4>
         </div>
         <div class="card-body p-4">
             <table class="table table-hover table-bordered text-center align-middle" style="border-radius: 10px; overflow: hidden;">

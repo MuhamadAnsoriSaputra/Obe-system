@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Dashboard | Wadir')
+
 @section('content')
     <style>
         body {

@@ -2,9 +2,9 @@
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
 @endpush
 
-@extends('layouts.app')
+@section('title', 'Manajemen Bobot')
 
-@section('title', 'Atur Bobot')
+@extends('layouts.app')
 
 @section('content')
     <div class="container-fluid">

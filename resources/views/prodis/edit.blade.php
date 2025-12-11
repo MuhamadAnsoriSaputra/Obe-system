@@ -4,6 +4,8 @@
 
 @extends('layouts.app')
 
+@section('title', 'Prodi | Edit')
+
 @section('content')
     <div class="container">
         <h2 class="fw-bold mb-4">Edit Program Studi</h2>

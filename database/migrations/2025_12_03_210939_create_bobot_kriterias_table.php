@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->timestamps();
 
             $table->foreign('kode_mk')
-                ->references('kode_mk')
+                      ->references('kode_mk')
                 ->on('mata_kuliahs')
                 ->cascadeOnDelete();
         });

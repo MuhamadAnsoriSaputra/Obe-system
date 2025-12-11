@@ -1,8 +1,14 @@
 @extends('layouts.app')
 
+@push('styles')
+    <link href="{{ asset('css/index.css') }}" rel="stylesheet">
+@endpush
+
+@section('title', 'Detail Mahasiswa')
+
 @section('content')
     <div class="container">
-        <h3 class="mb-3">Detail Mahasiswa</h3>
+        <h3 class="mb-3"><strong>Detail Mahasiswa</strong></h3>
 
         <div class="card mb-4">
             <div class="card-body">
@@ -14,10 +20,11 @@
         </div>
 
         <!-- TABEL NILAI PER MATA KULIAH -->
+
+        <div class="card-header text-dark mb-2">
+            <strong>Rekap Nilai Per Mata Kuliah</strong>
+        </div>
         <div class="card mb-4">
-            <div class="card-header bg-warning text-dark">
-                <strong>Rekap Nilai Per Mata Kuliah</strong>
-            </div>
             <div class="card-body p-0">
                 <table class="table table-bordered m-0">
                     <thead class="table-light">
@@ -26,8 +33,8 @@
                             <th>Kode MK</th>
                             <th>Kode CPL</th>
                             <th>Kode CPMK</th>
-                            <th>Skor Maks</th>
-                            <th>Nilai Perkuliahan</th>
+                            <th>Bobot CPMK</th>
+                            <th>Skor</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,10 +55,10 @@
 
         <!-- TABEL CAPAIAN CPL -->
         <!-- REKAP PER CPL -->
+        <div class="card-header text-dark fw-bold mb-2">
+            Tampilan Per CPL
+        </div>
         <div class="card mb-4">
-            <div class="card-header bg-warning text-dark fw-bold">
-                Tampilan Per CPL
-            </div>
             <div class="card-body p-0">
                 <table class="table table-bordered text-center align-middle">
                     <thead style="background: #f1c232; font-weight:bold;">
@@ -59,8 +66,8 @@
                             <th style="vertical-align: middle;">CPL</th>
                             <th style="vertical-align: middle;">MK</th>
                             <th style="vertical-align: middle;">CPMK</th>
-                            <th style="vertical-align: middle;">Skor Maks</th>
-                            <th style="vertical-align: middle;">Nilai Perkuliahan</th>
+                            <th style="vertical-align: middle;">Bobot CPMK</th>
+                            <th style="vertical-align: middle;">Skor</th>
                             <th style="vertical-align: middle; width: 200px;">
                                 Capaian CPL <br> (Total nilai perkuliahan / Total skor Maks) × 100%
                             </th>

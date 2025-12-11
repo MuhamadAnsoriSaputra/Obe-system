@@ -1,3 +1,5 @@
+@section('title', 'Manajemen CPMK')
+
 @push('styles')
     <link href="{{ asset('css/index.css') }}" rel="stylesheet">
 

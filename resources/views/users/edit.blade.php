@@ -2,6 +2,8 @@
     <link href="{{ asset('css/edit.css') }}" rel="stylesheet">
 @endpush
 
+@section('title', 'User | Edit')
+
 @extends('layouts.app')
 
 @section('content')

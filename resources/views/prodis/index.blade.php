@@ -4,6 +4,8 @@
 
 @extends('layouts.app')
 
+@section('title', 'Manajemen Prodi')
+
 @section('content')
     <div class="container">
         <h2 class="fw-bold mb-4">Manajemen Prodi</h2>

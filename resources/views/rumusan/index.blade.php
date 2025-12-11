@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Rumusan')
+
 @section('content')
     <div class="container">
         <h3 class="fw-bold mb-4">Pilih Jenis Rumusan</h3>

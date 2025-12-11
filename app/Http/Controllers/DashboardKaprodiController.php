@@ -8,14 +8,14 @@ class DashboardKaprodiController extends Controller
 {
     public function index()
     {
-        // 🔹 Hitung jumlah entitas penting
+        //  Hitung jumlah entitas penting
         $jumlahKurikulum = DB::table('angkatans')->count(); // Kurikulum = Angkatan
         $jumlahDosen = DB::table('dosens')->count();
         $jumlahMataKuliah = DB::table('mata_kuliahs')->count();
         $jumlahCPL = DB::table('cpls')->count();
         $jumlahCPMK = DB::table('cpmks')->count();
 
-        // 🔹 Hitung rata-rata capaian per kurikulum (angkatan)
+        // 🔹Hitung rata-rata capaian per kurikulum (angkatan)
         $capaianPerKurikulum = DB::table('hasil_obes')
             ->join('mahasiswas', 'hasil_obes.nim', '=', 'mahasiswas.nim')
             ->join('angkatans', 'mahasiswas.kode_angkatan', '=', 'angkatans.kode_angkatan')

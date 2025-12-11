@@ -2,6 +2,8 @@
     <link href="{{ asset('css/create.css') }}" rel="stylesheet">
 @endpush
 
+@section('title', 'Dosen | Tambah')
+
 @extends('layouts.app')
 
 @section('content')
