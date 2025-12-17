@@ -43,6 +43,16 @@ class PerangkinganController extends Controller
             }
         }
 
+        // Ambil nilai maksimum tiap mata kuliah (kriteria)
+        $maxNilai = [];
+
+        foreach ($matkuls as $mk) {
+            $maxNilai[$mk] = Penilaian::where('kode_mk', $mk)
+                ->where('kode_angkatan', $kode_angkatan)
+                ->max('nilai_perkuliahan') ?: 1;
+        }
+
+
         // Hitung total bobot → normalisasi
         $totalBobot = array_sum($bobot);
 
@@ -69,7 +79,7 @@ class PerangkinganController extends Controller
 
             foreach ($matkuls as $mk) {
                 $val = $nilai[$mk] ?? 0;
-                $norm = $val / 100;              // normalisasi nilai 0–100 → 0–1
+                $norm = $val / $maxNilai[$mk];
                 $skor += $norm * ($bobot[$mk] ?? 0);
             }
 
@@ -103,12 +113,40 @@ class PerangkinganController extends Controller
 
     public function bobotSimpan(Request $request)
     {
-        foreach ($request->bobot as $kode_mk => $nilai) {
-            BobotKriteria::where('kode_mk', $kode_mk)->update([
-                'bobot' => $nilai
-            ]);
+        $request->validate([
+            'bobot.*' => 'required|numeric|gt:0'
+        ], [
+            'bobot.*.gt' => 'Bobot tidak boleh 0'
+        ]);
+
+        $totalBobot = array_sum($request->bobot);
+
+        if ($totalBobot > 1) {
+            return back()
+                ->withInput()
+                ->withErrors(['total' => 'Total bobot tidak boleh lebih dari 1']);
         }
 
-        return back()->with('success', 'Bobot berhasil diperbarui');
+        $adaPerubahan = false;
+
+        foreach ($request->bobot as $kode_mk => $nilai) {
+
+            $data = BobotKriteria::firstOrNew([
+                'kode_mk' => $kode_mk
+            ]);
+
+            if ((float) $data->bobot !== (float) $nilai) {
+                $data->bobot = $nilai;
+                $data->save();
+                $adaPerubahan = true;
+            }
+        }
+
+        if (!$adaPerubahan) {
+            return back()->with('info', 'Tidak ada perubahan data bobot');
+        }
+
+        return back()->with('success', 'Data bobot berhasil diperbarui');
     }
+
 }

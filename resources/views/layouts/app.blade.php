@@ -88,11 +88,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('/penilaian') }}" class="nav-link {{ request()->is('penilaian*') ? 'active' : '' }}">
-                        <i class="fas fa-clipboard-check"></i> Penilaian
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="{{ url('/perangkingan') }}"
                         class="nav-link {{ request()->is('perangkingan*') ? 'active' : '' }}">
                         <i class="fas fa-chart-line"></i> Perangkingan SAW
@@ -150,6 +145,12 @@
                 <li class="nav-item">
                     <a href="{{ url('/penilaian') }}" class="nav-link {{ request()->is('penilaian*') ? 'active' : '' }}">
                         <i class="fas fa-clipboard-check"></i> Penilaian
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('/perangkingan') }}"
+                        class="nav-link {{ request()->is('perangkingan*') ? 'active' : '' }}">
+                        <i class="fas fa-chart-line"></i> Perangkingan SAW
                     </a>
                 </li>
             @endif

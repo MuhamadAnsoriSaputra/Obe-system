@@ -49,7 +49,7 @@ Route::get('/', fn() => redirect()->route('dashboard'));
 */
 Route::middleware(['auth'])->group(function () {
 
-    Route::middleware(['role:admin,akademik,kaprodi,wadir1'])->group(function () {
+    Route::middleware(['role:dosen'])->group(function () {
 
         // Halaman utama perangkingan
         Route::get('/perangkingan', [PerangkinganController::class, 'index'])
@@ -99,11 +99,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/mata_kuliahs/remove-cpmk/{id}', [MataKuliahController::class, 'removeCpmk'])
             ->name('mata_kuliahs.removeCpmk');
         Route::resource('dosens', DosenController::class);
-        Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
-        Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
-        Route::post('/penilaian/{kode_mk}/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
-        Route::get('/penilaian/import/{kode_mk}', [PenilaianController::class, 'showImportForm'])->name('penilaian.import.form');
-        Route::post('/penilaian/import/{kode_mk}', [PenilaianController::class, 'importExcel'])->name('penilaian.import');
     });
 
     Route::prefix('rumusan')->middleware(['role:admin,kaprodi,akademik'])->name('rumusan.')->group(function () {

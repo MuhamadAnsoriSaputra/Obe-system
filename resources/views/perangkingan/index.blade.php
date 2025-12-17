@@ -11,9 +11,13 @@
         <h2 class="fw-bold mb-4">Perangkingan Mahasiswa</h2>
 
         {{-- Tombol Atur Bobot --}}
-        <a href="{{ route('perangkingan.bobot') }}" class="btn-tambah btn-kembali mb-3">
-            <i class="fas fa-sliders-h me-2"></i> Atur Bobot
-        </a>
+        @auth
+            @if (auth()->user()->role === 'dosen')
+                <a href="{{ route('perangkingan.bobot') }}" class="btn-tambah btn-kembali mb-3">
+                    <i class="fas fa-sliders-h me-2"></i> Atur Bobot
+                </a>
+            @endif
+        @endauth
 
         {{-- Dropdown Angkatan --}}
         <form method="GET" action="{{ route('perangkingan.index') }}" class="mb-4">

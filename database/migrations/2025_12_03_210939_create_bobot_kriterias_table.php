@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('bobot_kriterias', function (Blueprint $table) {
             $table->id();
             $table->string('kode_mk', 20);
-            $table->decimal('bobot', 5, 2)->default(1); // contoh: 0.25
+            $table->decimal('bobot', 6, 3)->default(1); // contoh: 0.25
             $table->timestamps();
 
             $table->foreign('kode_mk')

@@ -8,6 +8,24 @@
 
 @section('content')
     <div class="container-fluid">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('info'))
+            <div class="alert alert-warning">
+                {{ session('info') }}
+            </div>
+        @endif
+
+        @if ($errors->has('total'))
+            <div class="alert alert-danger">
+                {{ $errors->first('total') }}
+            </div>
+        @endif
+
         <h2 class="fw-bold mb-4">Atur Bobot Kriteria</h2>
 
         {{-- Tombol Kembali --}}
@@ -33,8 +51,9 @@
                             <td>{{ $mk->kode_mk }}</td>
                             <td>{{ $mk->nama_mk }}</td>
                             <td>
-                                <input type="number" step="0.01" name="bobot[{{ $mk->kode_mk }}]"
-                                    value="{{ $bobot[$mk->kode_mk] ?? 1 }}" class="form-control" required>
+                                <input type="number" step="0.001" min="0.001" name="bobot[{{ $mk->kode_mk }}]"
+                                    value="{{ old('bobot.' . $mk->kode_mk, $bobot[$mk->kode_mk] ?? 1) }}" class="form-control"
+                                    required>
                             </td>
                         </tr>
                     @endforeach

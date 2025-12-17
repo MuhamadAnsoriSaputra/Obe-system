@@ -30,9 +30,9 @@
                     @csrf
 
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Tahun Angkatan</label>
+                        <label class="form-label">Tahun Kurikulum</label>
                         <select name="kode_angkatan" id="angkatan" class="form-select" required>
-                            <option value="">-- Pilih Angkatan --</option>
+                            <option value="">-- Pilih Kurikulum --</option>
                             @foreach($angkatans as $angkatan)
                                 <option value="{{ $angkatan->kode_angkatan }}">{{ $angkatan->tahun }}</option>
                             @endforeach
