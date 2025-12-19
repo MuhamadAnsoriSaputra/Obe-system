@@ -152,23 +152,31 @@
                                 <td>{{ $item->kode_angkatan }}</td>
                                 <td>{{ $item->kode_cpmk }}</td>
                                 <td>{{ $item->bobot }}</td>
-                                <td class="d-flex gap-1">
+                                <td>
+    <div class="d-flex align-items-center gap-1">
+        <button type="button"
+            class="btn btn-sm btn-warning btn-edit-bobot"
+            data-bs-toggle="modal"
+            data-bs-target="#editBobotModal"
+            data-id="{{ $item->id }}"
+            data-bobot="{{ $item->bobot }}">
+            <i class="fas fa-edit"></i>
+        </button>
 
-                                    <button type="button" class="btn btn-sm btn-warning btn-edit-bobot" data-bs-toggle="modal"
-                                        data-bs-target="#editBobotModal" data-id="{{ $item->id }}"
-                                        data-bobot="{{ $item->bobot }}">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
+        <form action="{{ route('mata_kuliahs.removeCpmk', $item->id) }}"
+              method="POST"
+              class="m-0 d-inline-flex">
+            @csrf
+            @method('DELETE')
+            <button type="submit"
+                class="btn btn-sm btn-danger"
+                onclick="return confirm('Yakin ingin menghapus CPMK ini dari mata kuliah?')">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>
+    </div>
+</td>
 
-                                    <form action="{{ route('mata_kuliahs.removeCpmk', $item->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Yakin ingin menghapus CPMK ini dari mata kuliah?')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
                             </tr>
                             <!-- Modal Edit Bobot -->
                             <div class="modal fade" id="editBobotModal{{ $item->id }}" tabindex="-1">
