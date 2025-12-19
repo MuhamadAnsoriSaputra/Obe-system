@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    // Karena kamu pakai kolom id_user
+    //  pakai kolom id_user
     protected $primaryKey = 'id_user';
     public $incrementing = true;
     protected $keyType = 'int';

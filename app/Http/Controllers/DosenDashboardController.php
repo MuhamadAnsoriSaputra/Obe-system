@@ -13,39 +13,57 @@ class DosenDashboardController extends Controller
 {
     public function index()
     {
-        // Ambil data dosen login berdasarkan nip dari user login
-        $nip = Auth::user()->nip;
+        $user = auth()->user();
 
-        // Hitung jumlah mata kuliah yang diampu dosen (via tabel pivot)
-        $jumlahMataKuliah = DB::table('dosen_mata_kuliah')
+        $dosen = DB::table('dosens')
+            ->where('id_user', $user->id_user)
+            ->first();
+
+        if (!$dosen) {
+            abort(403, 'Dosen tidak ditemukan');
+        }
+
+        $nip = $dosen->nip;
+
+        $mataKuliahDosen = DB::table('dosen_mata_kuliah')
             ->where('nip', $nip)
-            ->distinct('kode_mk')
-            ->count('kode_mk');
+            ->select('kode_mk', 'kode_angkatan')
+            ->get();
 
-        // Hitung jumlah CPL dan CPMK yang terkait dengan mata kuliah yang dia ampu
-        $kodeMKs = DB::table('dosen_mata_kuliah')
-            ->where('nip', $nip)
-            ->pluck('kode_mk');
+        $kodeMKs = $mataKuliahDosen->pluck('kode_mk')->unique();
 
-        $jumlahCPL = Cpl::count(); // opsional: total CPL
-        $jumlahCPMK = Cpmk::whereIn('kode_mk', $kodeMKs)->count();
+        $jumlahMataKuliah = $kodeMKs->count();
 
-        // Hitung jumlah penilaian yang pernah dimasukkan oleh dosen
-        $jumlahPenilaian = Penilaian::whereIn('kode_mk', $kodeMKs)->count();
+        $jumlahCPL = DB::table('cpl_mata_kuliah')
+            ->whereIn('kode_mk', $kodeMKs)
+            ->distinct('kode_cpl')
+            ->count('kode_cpl');
 
-        // Data untuk grafik: jumlah mahasiswa per mata kuliah yang dia ampu
+        $jumlahCPMK = DB::table('cpmk_mata_kuliah')
+            ->whereIn('kode_mk', $kodeMKs)
+            ->distinct('kode_cpmk')
+            ->count('kode_cpmk');
+
+        $jumlahPenilaian = DB::table('penilaians')
+            ->whereIn('kode_mk', $kodeMKs)
+            ->distinct(DB::raw("CONCAT(nim,'-',kode_mk)"))
+            ->count();
+
         $chartData = DB::table('penilaians')
-            ->select('kode_mk', DB::raw('COUNT(DISTINCT nim) as total'))
+            ->select(
+                'kode_mk',
+                DB::raw('COUNT(DISTINCT nim) as total')
+            )
             ->whereIn('kode_mk', $kodeMKs)
             ->groupBy('kode_mk')
             ->get();
 
-        return view('dashboard.dosen', [
-            'jumlahMataKuliah' => $jumlahMataKuliah,
-            'jumlahCPL' => $jumlahCPL,
-            'jumlahCPMK' => $jumlahCPMK,
-            'jumlahPenilaian' => $jumlahPenilaian,
-            'chartData' => $chartData,
-        ]);
+        return view('dashboard.dosen', compact(
+            'jumlahMataKuliah',
+            'jumlahCPL',
+            'jumlahCPMK',
+            'jumlahPenilaian',
+            'chartData'
+        ));
     }
 }

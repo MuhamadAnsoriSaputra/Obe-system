@@ -200,6 +200,21 @@ class MataKuliahController extends Controller
         return redirect()->back()->with('success', 'Bobot CPMK berhasil disimpan.');
     }
 
+    public function updateBobot(Request $request, $id)
+    {
+        $request->validate([
+            'bobot' => 'required|numeric|min:1|max:100'
+        ]);
+
+        \DB::table('cpmk_mata_kuliah')
+            ->where('id', $id)
+            ->update([
+                'bobot' => $request->bobot,
+                'updated_at' => now()
+            ]);
+
+        return redirect()->back()->with('success', 'Bobot CPMK berhasil diperbarui.');
+    }
 
     public function totalBobot($kode_mk, $kode_angkatan)
     {

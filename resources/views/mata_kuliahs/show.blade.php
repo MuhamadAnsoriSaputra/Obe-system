@@ -152,17 +152,52 @@
                                 <td>{{ $item->kode_angkatan }}</td>
                                 <td>{{ $item->kode_cpmk }}</td>
                                 <td>{{ $item->bobot }}</td>
-                                <td>
+                                <td class="d-flex gap-1">
+
+                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#editBobotModal{{ $item->id }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
                                     <form action="{{ route('mata_kuliahs.removeCpmk', $item->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm"
+                                        <button type="submit" class="btn btn-sm btn-danger"
                                             onclick="return confirm('Yakin ingin menghapus CPMK ini dari mata kuliah?')">
-                                            Hapus
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
                                 </td>
                             </tr>
+                            <!-- Modal Edit Bobot -->
+                            <div class="modal fade" id="editBobotModal{{ $item->id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <form action="{{ route('mata_kuliahs.updateBobot', $item->id) }}" method="POST"
+                                        class="modal-content">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit Bobot CPMK</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Bobot (%)</label>
+                                                <input type="number" name="bobot" class="form-control"
+                                                    value="{{ $item->bobot }}" min="1" max="100" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button class="btn btn-primary btn-sm">
+                                                <i class="fas fa-save"></i> Simpan
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         @empty
                             <tr>
                                 <td colspan="4" class="text-center">Belum ada CPMK</td>
@@ -170,7 +205,52 @@
                         @endforelse
                     </tbody>
                 </table>
+                <div class="modal fade" id="editBobotModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-sm">
+                        <form id="formEditBobot" method="POST" class="modal-content">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Bobot CPMK</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <label class="form-label">Bobot (%)</label>
+                                <input type="number" name="bobot" id="inputBobot" class="form-control" min="1" max="100"
+                                    required>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-save"></i> Simpan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const modal = document.getElementById('editBobotModal');
+        const inputBobot = document.getElementById('inputBobot');
+        const form = document.getElementById('formEditBobot');
+
+        modal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+
+            const id = button.getAttribute('data-id');
+            const bobot = button.getAttribute('data-bobot');
+
+            inputBobot.value = bobot;
+            form.action = `/mata-kuliahs/update-bobot/${id}`;
+        });
+
+    });
+</script>

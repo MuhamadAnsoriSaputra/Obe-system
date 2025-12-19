@@ -74,7 +74,7 @@
                 @endif
 
                 <div class="mb-3">
-                    <label for="kode_angkatan" class="form-label">Angkatan</label>
+                    <label for="kode_angkatan" class="form-label">Kurikulum</label>
                     <select name="kode_angkatan" class="form-select" required>
                         @foreach($angkatans as $angkatan)
                             <option value="{{ $angkatan->kode_angkatan }}"

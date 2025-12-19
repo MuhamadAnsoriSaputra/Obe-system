@@ -15,7 +15,7 @@
                 <p><strong>NIM:</strong> {{ $mahasiswa->nim }}</p>
                 <p><strong>Nama:</strong> {{ $mahasiswa->nama }}</p>
                 <p><strong>Program Studi:</strong> {{ $mahasiswa->prodi->nama_prodi }}</p>
-                <p><strong>Angkatan:</strong> {{ $mahasiswa->angkatan->nama_angkatan }}</p>
+                <p><strong>Tahun Masuk:</strong> {{ $mahasiswa->tahun_masuk }}</p>
             </div>
         </div>
 

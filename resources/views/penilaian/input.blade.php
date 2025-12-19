@@ -15,6 +15,16 @@
             <div class="alert alert-success mt-3">{{ session('success') }}</div>
         @endif
 
+        @if ($errors->any())
+            <div class="alert alert-danger mt-3">
+                <ul class="mb-0 list-unstyled">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('penilaian.import', $matakuliah->kode_mk) }}" method="POST" enctype="multipart/form-data"
             class="mb-4">
             @csrf
@@ -55,6 +65,15 @@
         {{-- Tabel Daftar Mahasiswa yang Sudah Dinilai --}}
         <h5 class="mt-4">Daftar Mahasiswa yang Sudah Dinilai</h5>
 
+        <form action="{{ route('penilaian.destroyAll', $matakuliah->kode_mk) }}" method="POST"
+            onsubmit="return confirm('Yakin ingin menghapus semua nilai mahasiswa?')" class="mb-3">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-light fw-bold px-4">
+                <i class="fas fa-trash me-2"></i> Hapus Semua Nilai
+            </button>
+        </form>
+
         <table class="table table-bordered text-center align-middle mt-2">
             <thead class="table-warning">
                 <tr>
@@ -62,6 +81,7 @@
                     <th>NIM</th>
                     <th>Nama Mahasiswa</th>
                     <th>Nilai Akhir</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -72,6 +92,22 @@
                         <td>{{ $item->nim }}</td>
                         <td>{{ $item->nama ?? '-' }}</td>
                         <td>{{ number_format($item->nilai_akhir, 2) }}</td>
+                        <td>
+                            {{-- Tombol Edit (dummy / nanti bisa dikembangkan) --}}
+                            <a href="#" class="btn btn-sm btn-warning me-1">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            {{-- Tombol Hapus --}}
+                            <form action="{{ route('penilaian.destroy', [$matakuliah->kode_mk, $item->nim]) }}" method="POST"
+                                class="d-inline" onsubmit="return confirm('Yakin ingin menghapus nilai mahasiswa ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 @empty
                     <tr>

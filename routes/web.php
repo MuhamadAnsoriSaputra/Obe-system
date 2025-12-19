@@ -40,7 +40,9 @@ Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallba
 | DEFAULT REDIRECT
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn() => redirect()->route('dashboard'));
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -138,16 +140,18 @@ Route::middleware(['auth'])->group(function () {
             ->name('mata_kuliahs.simpanBobot');
         Route::delete('/mata_kuliahs/{kode_mk}/remove-cpmk/{kode_cpmk}', [MataKuliahController::class, 'removeCpmk'])
             ->name('mata_kuliahs.removeCpmk');
-        Route::resource('penilaian', PenilaianController::class);
+        Route::put('/mata-kuliahs/update-bobot/{id}', [MataKuliahController::class, 'updateBobot'])
+            ->name('mata_kuliahs.updateBobot');
         Route::get('/penilaian', [PenilaianController::class, 'index'])->name('penilaian.index');
         Route::get('/penilaian/import/{kode_mk}', [PenilaianController::class, 'showImportForm'])->name('penilaian.import.form');
         Route::post('/penilaian/import/{kode_mk}', [PenilaianController::class, 'importExcel'])->name('penilaian.import');
-
-        // Halaman input nilai per mata kuliah
         Route::get('/penilaian/{kode_mk}/input', [PenilaianController::class, 'input'])->name('penilaian.input');
-
-        // Simpan nilai
         Route::post('/penilaian/{kode_mk}/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
+        Route::delete('/penilaian/{kode_mk}/{nim}', [PenilaianController::class, 'destroy'])
+            ->name('penilaian.destroy');
+
+        Route::delete('/penilaian/{kode_mk}', [PenilaianController::class, 'destroyAll'])
+            ->name('penilaian.destroyAll');
         Route::middleware(['role:admin,dosen,akademik'])->group(function () {
 
             Route::delete(

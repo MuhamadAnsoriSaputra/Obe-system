@@ -87,12 +87,6 @@
                         <i class="fas fa-user-tie"></i> Dosen
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="{{ url('/perangkingan') }}"
-                        class="nav-link {{ request()->is('perangkingan*') ? 'active' : '' }}">
-                        <i class="fas fa-chart-line"></i> Perangkingan SAW
-                    </a>
-                </li>
             @endif
 
             {{-- ===================================== --}}

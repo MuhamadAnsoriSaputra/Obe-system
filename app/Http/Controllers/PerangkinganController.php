@@ -20,30 +20,22 @@ class PerangkinganController extends Controller
             return view('perangkingan.index', compact('angkatans'));
         }
 
-        // ---------------------------------------------------------
-        // 1. Ambil daftar MK yang ada nilainya di penilaians
-        // ---------------------------------------------------------
         $matkuls = Penilaian::where('kode_angkatan', $kode_angkatan)
             ->select('kode_mk')
             ->groupBy('kode_mk')
             ->pluck('kode_mk')
             ->toArray();
 
-        // ---------------------------------------------------------
-        // 2. Ambil bobot berdasarkan kode_mk
-        // ---------------------------------------------------------
         $bobot = BobotKriteria::whereIn('kode_mk', $matkuls)
             ->pluck('bobot', 'kode_mk')
             ->toArray();
 
-        // Jika ada MK tanpa bobot → set bobot default 1
         foreach ($matkuls as $mk) {
             if (!isset($bobot[$mk])) {
                 $bobot[$mk] = 1;
             }
         }
 
-        // Ambil nilai maksimum tiap mata kuliah (kriteria)
         $maxNilai = [];
 
         foreach ($matkuls as $mk) {
@@ -53,23 +45,18 @@ class PerangkinganController extends Controller
         }
 
 
-        // Hitung total bobot → normalisasi
         $totalBobot = array_sum($bobot);
 
         foreach ($bobot as $mk => $b) {
             $bobot[$mk] = $b / ($totalBobot ?: 1);
         }
 
-        // ---------------------------------------------------------
-        // 3. Ambil mahasiswa
-        // ---------------------------------------------------------
         $mahasiswas = Mahasiswa::where('kode_angkatan', $kode_angkatan)->get();
 
         $hasil = [];
 
         foreach ($mahasiswas as $mhs) {
 
-            // Ambil nilai MK student tersebut
             $nilai = Penilaian::where('nim', $mhs->nim)
                 ->where('kode_angkatan', $kode_angkatan)
                 ->pluck('nilai_perkuliahan', 'kode_mk')
@@ -90,17 +77,11 @@ class PerangkinganController extends Controller
             ];
         }
 
-        // ---------------------------------------------------------
-        // 4. Ranking
-        // ---------------------------------------------------------
         usort($hasil, fn($a, $b) => $b['skor'] <=> $a['skor']);
 
         return view('perangkingan.index', compact('angkatans', 'hasil', 'kode_angkatan'));
     }
 
-    // ============================================================
-    //     FITUR ATUR BOBOT
-    // ============================================================
 
     public function bobotIndex()
     {

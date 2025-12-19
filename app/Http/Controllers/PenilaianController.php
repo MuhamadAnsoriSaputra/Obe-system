@@ -47,6 +47,27 @@ class PenilaianController extends Controller
         $nim = $request->nim;
         $nilaiAkhir = $request->nilai_akhir;
 
+        $mahasiswa = DB::table('mahasiswas')->where('nim', $nim)->first();
+        if (!$mahasiswa) {
+            return redirect()->back()->withErrors([
+                'nim' => 'Data mahasiswa tidak ditemukan'
+            ])->withInput();
+        }
+
+        // Ambil angkatan mahasiswa
+        $kode_angkatan = $mahasiswa->kode_angkatan;
+
+        $sudahDinilai = DB::table('penilaians')
+            ->where('nim', $nim)
+            ->where('kode_mk', $kode_mk)
+            ->exists();
+
+        if ($sudahDinilai) {
+            return redirect()->back()->withErrors([
+                'nim' => 'Mahasiswa sudah dinilai pada mata kuliah ini'
+            ])->withInput();
+        }
+
         // Ambil angkatan mahasiswa
         $kode_angkatan = DB::table('mahasiswas')
             ->where('nim', $nim)
@@ -171,5 +192,30 @@ class PenilaianController extends Controller
         }
 
         return redirect()->route('penilaian.input', $kode_mk)->with('success', 'Data nilai berhasil diimport dari Excel!');
+    }
+
+    public function destroy($kode_mk, $nim)
+    {
+        DB::table('penilaians')
+            ->where('kode_mk', $kode_mk)
+            ->where('nim', $nim)
+            ->delete();
+
+        DB::table('hasil_obes')
+            ->where('nim', $nim)
+            ->delete();
+
+        return redirect()->back()->with('success', 'Nilai mahasiswa berhasil dihapus!');
+    }
+
+    public function destroyAll($kode_mk)
+    {
+        DB::table('penilaians')
+            ->where('kode_mk', $kode_mk)
+            ->delete();
+
+        DB::table('hasil_obes')->truncate();
+
+        return redirect()->back()->with('success', 'Semua nilai berhasil dihapus!');
     }
 }
