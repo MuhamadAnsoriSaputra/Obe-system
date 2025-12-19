@@ -154,8 +154,9 @@
                                 <td>{{ $item->bobot }}</td>
                                 <td class="d-flex gap-1">
 
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#editBobotModal{{ $item->id }}">
+                                    <button type="button" class="btn btn-sm btn-warning btn-edit-bobot" data-bs-toggle="modal"
+                                        data-bs-target="#editBobotModal" data-id="{{ $item->id }}"
+                                        data-bobot="{{ $item->bobot }}">
                                         <i class="fas fa-edit"></i>
                                     </button>
 
